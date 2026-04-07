@@ -6,32 +6,395 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A100000001000001 /* HiBiPicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000001; };
+		A100000001000002 /* RootNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000002; };
+		A100000001000003 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000003; };
+		A100000001000004 /* DSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000004; };
+		A100000001000005 /* DSCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000005; };
+		A100000001000006 /* DSSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000006; };
+		A100000001000007 /* DSTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000007; };
+		A100000001000008 /* DSToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000008; };
+		A100000001000009 /* DSColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000009; };
+		A100000001000010 /* DSShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000010; };
+		A100000001000011 /* DSSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000011; };
+		A100000001000012 /* DSTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000012; };
+		A100000001000013 /* DateCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000013; };
+		A100000001000014 /* EventLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000014; };
+		A100000001000015 /* SettingsLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000015; };
+		A100000001000016 /* AppDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000016; };
+		A100000001000017 /* DatabaseInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000017; };
+		A100000001000018 /* EventMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000018; };
+		A100000001000019 /* EventRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000019; };
+		A100000001000020 /* SettingsRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000020; };
+		A100000001000021 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000021; };
+		A100000001000022 /* DesignTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000022; };
+		A100000001000023 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000023; };
+		A100000001000024 /* EventSortType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000024; };
+		A100000001000025 /* PhraseTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000025; };
+		A100000001000026 /* EventRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000026; };
+		A100000001000027 /* SettingsRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000027; };
+		A100000001000028 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000028; };
+		A100000001000029 /* CameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000029; };
+		A100000001000030 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000030; };
+		A100000001000031 /* EditorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000031; };
+		A100000001000032 /* EditorToolPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000032; };
+		A100000001000033 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000033; };
+		A100000001000034 /* ImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000034; };
+		A100000001000035 /* SaveSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000035; };
+		A100000001000036 /* ShareSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000036; };
+		A100000001000037 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000037; };
+		A100000001000038 /* CustomPhraseEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000038; };
+		A100000001000039 /* DesignTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000039; };
+		A100000001000040 /* EventCreateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000040; };
+		A100000001000041 /* EventCreateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000041; };
+		A100000001000042 /* EventPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000042; };
+		A100000001000043 /* PhraseTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000043; };
+		A100000001000044 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000044; };
+		A100000001000045 /* EventActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000045; };
+		A100000001000046 /* EventCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000046; };
+		A100000001000047 /* EventListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000047; };
+		A100000001000048 /* EventListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000048; };
+		A100000001000049 /* PhotoPickerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000049; };
+		A100000001000050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000050; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B100000001000001 /* HiBiPicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiBiPicApp.swift; sourceTree = "<group>"; };
+		B100000001000002 /* RootNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationView.swift; sourceTree = "<group>"; };
+		B100000001000003 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
+		B100000001000004 /* DSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSButton.swift; sourceTree = "<group>"; };
+		B100000001000005 /* DSCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSCard.swift; sourceTree = "<group>"; };
+		B100000001000006 /* DSSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSSegmentedControl.swift; sourceTree = "<group>"; };
+		B100000001000007 /* DSTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSTextField.swift; sourceTree = "<group>"; };
+		B100000001000008 /* DSToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSToast.swift; sourceTree = "<group>"; };
+		B100000001000009 /* DSColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSColors.swift; sourceTree = "<group>"; };
+		B100000001000010 /* DSShadow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSShadow.swift; sourceTree = "<group>"; };
+		B100000001000011 /* DSSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSSpacing.swift; sourceTree = "<group>"; };
+		B100000001000012 /* DSTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSTypography.swift; sourceTree = "<group>"; };
+		B100000001000013 /* DateCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateCalculator.swift; sourceTree = "<group>"; };
+		B100000001000014 /* EventLocalDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventLocalDataSource.swift; sourceTree = "<group>"; };
+		B100000001000015 /* SettingsLocalDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLocalDataSource.swift; sourceTree = "<group>"; };
+		B100000001000016 /* AppDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDatabase.swift; sourceTree = "<group>"; };
+		B100000001000017 /* DatabaseInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseInitializer.swift; sourceTree = "<group>"; };
+		B100000001000018 /* EventMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMapper.swift; sourceTree = "<group>"; };
+		B100000001000019 /* EventRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRepositoryImpl.swift; sourceTree = "<group>"; };
+		B100000001000020 /* SettingsRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRepositoryImpl.swift; sourceTree = "<group>"; };
+		B100000001000021 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		B100000001000022 /* DesignTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTemplate.swift; sourceTree = "<group>"; };
+		B100000001000023 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		B100000001000024 /* EventSortType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSortType.swift; sourceTree = "<group>"; };
+		B100000001000025 /* PhraseTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhraseTemplate.swift; sourceTree = "<group>"; };
+		B100000001000026 /* EventRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRepositoryProtocol.swift; sourceTree = "<group>"; };
+		B100000001000027 /* SettingsRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRepositoryProtocol.swift; sourceTree = "<group>"; };
+		B100000001000028 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		B100000001000029 /* CameraScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraScreen.swift; sourceTree = "<group>"; };
+		B100000001000030 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		B100000001000031 /* EditorScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorScreen.swift; sourceTree = "<group>"; };
+		B100000001000032 /* EditorToolPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorToolPanel.swift; sourceTree = "<group>"; };
+		B100000001000033 /* EditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModel.swift; sourceTree = "<group>"; };
+		B100000001000034 /* ImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageRenderer.swift; sourceTree = "<group>"; };
+		B100000001000035 /* SaveSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSuccessView.swift; sourceTree = "<group>"; };
+		B100000001000036 /* ShareSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheetView.swift; sourceTree = "<group>"; };
+		B100000001000037 /* TextOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayView.swift; sourceTree = "<group>"; };
+		B100000001000038 /* CustomPhraseEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPhraseEditor.swift; sourceTree = "<group>"; };
+		B100000001000039 /* DesignTemplatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTemplatePicker.swift; sourceTree = "<group>"; };
+		B100000001000040 /* EventCreateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCreateScreen.swift; sourceTree = "<group>"; };
+		B100000001000041 /* EventCreateViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCreateViewModel.swift; sourceTree = "<group>"; };
+		B100000001000042 /* EventPreviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventPreviewSection.swift; sourceTree = "<group>"; };
+		B100000001000043 /* PhraseTemplatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhraseTemplatePicker.swift; sourceTree = "<group>"; };
+		B100000001000044 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		B100000001000045 /* EventActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventActionSheet.swift; sourceTree = "<group>"; };
+		B100000001000046 /* EventCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCardView.swift; sourceTree = "<group>"; };
+		B100000001000047 /* EventListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListScreen.swift; sourceTree = "<group>"; };
+		B100000001000048 /* EventListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListViewModel.swift; sourceTree = "<group>"; };
+		B100000001000049 /* PhotoPickerScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerScreen.swift; sourceTree = "<group>"; };
+		B100000001000050 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B100000001000051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B100000001000099 /* HiBiPic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiBiPic.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C100000001000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
-		00000000000000000000001 /* HiBiPic */ = {
+		D100000001000000 /* Root */ = {
 			isa = PBXGroup;
 			children = (
+				D100000001000001 /* HiBiPic */,
+				D100000001000098 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D100000001000098 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000099 /* HiBiPic.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D100000001000001 /* HiBiPic */ = {
+			isa = PBXGroup;
+			children = (
+				D100000001000010 /* App */,
+				D100000001000020 /* Core */,
+				D100000001000040 /* Data */,
+				D100000001000050 /* Domain */,
+				D100000001000060 /* Features */,
+				D100000001000070 /* Resources */,
+				B100000001000051 /* Info.plist */,
 			);
 			path = HiBiPic;
 			sourceTree = "<group>";
 		};
-		00000000000000000000000 /* Root */ = {
+		D100000001000010 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				00000000000000000000001 /* HiBiPic */,
+				B100000001000001 /* HiBiPicApp.swift */,
+				B100000001000002 /* RootNavigationView.swift */,
+				B100000001000003 /* AppDependencies.swift */,
 			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		D100000001000020 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				D100000001000021 /* Components */,
+				D100000001000022 /* Theme */,
+				D100000001000023 /* Utils */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		D100000001000021 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000004 /* DSButton.swift */,
+				B100000001000005 /* DSCard.swift */,
+				B100000001000006 /* DSSegmentedControl.swift */,
+				B100000001000007 /* DSTextField.swift */,
+				B100000001000008 /* DSToast.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		D100000001000022 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000009 /* DSColors.swift */,
+				B100000001000010 /* DSShadow.swift */,
+				B100000001000011 /* DSSpacing.swift */,
+				B100000001000012 /* DSTypography.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		D100000001000023 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000013 /* DateCalculator.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		D100000001000040 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				D100000001000041 /* DataSources */,
+				D100000001000042 /* Database */,
+				D100000001000043 /* Mappers */,
+				D100000001000044 /* Repositories */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		D100000001000041 /* DataSources */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000014 /* EventLocalDataSource.swift */,
+				B100000001000015 /* SettingsLocalDataSource.swift */,
+			);
+			path = DataSources;
+			sourceTree = "<group>";
+		};
+		D100000001000042 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000016 /* AppDatabase.swift */,
+				B100000001000017 /* DatabaseInitializer.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		D100000001000043 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000018 /* EventMapper.swift */,
+			);
+			path = Mappers;
+			sourceTree = "<group>";
+		};
+		D100000001000044 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000019 /* EventRepositoryImpl.swift */,
+				B100000001000020 /* SettingsRepositoryImpl.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		D100000001000050 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				D100000001000051 /* Models */,
+				D100000001000052 /* Repositories */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		D100000001000051 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000021 /* AppSettings.swift */,
+				B100000001000022 /* DesignTemplate.swift */,
+				B100000001000023 /* Event.swift */,
+				B100000001000024 /* EventSortType.swift */,
+				B100000001000025 /* PhraseTemplate.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D100000001000052 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000026 /* EventRepositoryProtocol.swift */,
+				B100000001000027 /* SettingsRepositoryProtocol.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		D100000001000060 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				D100000001000061 /* Camera */,
+				D100000001000062 /* Editor */,
+				D100000001000063 /* EventCreate */,
+				D100000001000064 /* EventList */,
+				D100000001000065 /* PhotoPicker */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		D100000001000061 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000028 /* CameraPreviewView.swift */,
+				B100000001000029 /* CameraScreen.swift */,
+				B100000001000030 /* CameraViewModel.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		D100000001000062 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000031 /* EditorScreen.swift */,
+				B100000001000032 /* EditorToolPanel.swift */,
+				B100000001000033 /* EditorViewModel.swift */,
+				B100000001000034 /* ImageRenderer.swift */,
+				B100000001000035 /* SaveSuccessView.swift */,
+				B100000001000036 /* ShareSheetView.swift */,
+				B100000001000037 /* TextOverlayView.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		D100000001000063 /* EventCreate */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000038 /* CustomPhraseEditor.swift */,
+				B100000001000039 /* DesignTemplatePicker.swift */,
+				B100000001000040 /* EventCreateScreen.swift */,
+				B100000001000041 /* EventCreateViewModel.swift */,
+				B100000001000042 /* EventPreviewSection.swift */,
+				B100000001000043 /* PhraseTemplatePicker.swift */,
+			);
+			path = EventCreate;
+			sourceTree = "<group>";
+		};
+		D100000001000064 /* EventList */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000044 /* EmptyStateView.swift */,
+				B100000001000045 /* EventActionSheet.swift */,
+				B100000001000046 /* EventCardView.swift */,
+				B100000001000047 /* EventListScreen.swift */,
+				B100000001000048 /* EventListViewModel.swift */,
+			);
+			path = EventList;
+			sourceTree = "<group>";
+		};
+		D100000001000065 /* PhotoPicker */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000049 /* PhotoPickerScreen.swift */,
+			);
+			path = PhotoPicker;
+			sourceTree = "<group>";
+		};
+		D100000001000070 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000050 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
+/* Begin PBXNativeTarget section */
+		E100000001000001 /* HiBiPic */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F100000001000003 /* Build configuration list for PBXNativeTarget "HiBiPic" */;
+			buildPhases = (
+				C100000001000002 /* Sources */,
+				C100000001000001 /* Frameworks */,
+				C100000001000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HiBiPic;
+			productName = HiBiPic;
+			productReference = B100000001000099 /* HiBiPic.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
 /* Begin PBXProject section */
-		00000000000000000000002 /* Project object */ = {
+		E100000001000000 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					E100000001000001 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
 			};
-			buildConfigurationList = 00000000000000000000003 /* Build configuration list for PBXProject */;
+			buildConfigurationList = F100000001000001 /* Build configuration list for PBXProject "HiBiPic" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = ja;
 			hasScannedForEncodings = 0;
@@ -40,46 +403,266 @@
 				en,
 				Base,
 			);
-			mainGroup = 00000000000000000000000 /* Root */;
-			productRefGroup = 00000000000000000000000 /* Root */;
+			mainGroup = D100000001000000 /* Root */;
+			productRefGroup = D100000001000098 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				E100000001000001 /* HiBiPic */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		C100000001000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000001000050 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C100000001000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000001000001 /* HiBiPicApp.swift in Sources */,
+				A100000001000002 /* RootNavigationView.swift in Sources */,
+				A100000001000003 /* AppDependencies.swift in Sources */,
+				A100000001000004 /* DSButton.swift in Sources */,
+				A100000001000005 /* DSCard.swift in Sources */,
+				A100000001000006 /* DSSegmentedControl.swift in Sources */,
+				A100000001000007 /* DSTextField.swift in Sources */,
+				A100000001000008 /* DSToast.swift in Sources */,
+				A100000001000009 /* DSColors.swift in Sources */,
+				A100000001000010 /* DSShadow.swift in Sources */,
+				A100000001000011 /* DSSpacing.swift in Sources */,
+				A100000001000012 /* DSTypography.swift in Sources */,
+				A100000001000013 /* DateCalculator.swift in Sources */,
+				A100000001000014 /* EventLocalDataSource.swift in Sources */,
+				A100000001000015 /* SettingsLocalDataSource.swift in Sources */,
+				A100000001000016 /* AppDatabase.swift in Sources */,
+				A100000001000017 /* DatabaseInitializer.swift in Sources */,
+				A100000001000018 /* EventMapper.swift in Sources */,
+				A100000001000019 /* EventRepositoryImpl.swift in Sources */,
+				A100000001000020 /* SettingsRepositoryImpl.swift in Sources */,
+				A100000001000021 /* AppSettings.swift in Sources */,
+				A100000001000022 /* DesignTemplate.swift in Sources */,
+				A100000001000023 /* Event.swift in Sources */,
+				A100000001000024 /* EventSortType.swift in Sources */,
+				A100000001000025 /* PhraseTemplate.swift in Sources */,
+				A100000001000026 /* EventRepositoryProtocol.swift in Sources */,
+				A100000001000027 /* SettingsRepositoryProtocol.swift in Sources */,
+				A100000001000028 /* CameraPreviewView.swift in Sources */,
+				A100000001000029 /* CameraScreen.swift in Sources */,
+				A100000001000030 /* CameraViewModel.swift in Sources */,
+				A100000001000031 /* EditorScreen.swift in Sources */,
+				A100000001000032 /* EditorToolPanel.swift in Sources */,
+				A100000001000033 /* EditorViewModel.swift in Sources */,
+				A100000001000034 /* ImageRenderer.swift in Sources */,
+				A100000001000035 /* SaveSuccessView.swift in Sources */,
+				A100000001000036 /* ShareSheetView.swift in Sources */,
+				A100000001000037 /* TextOverlayView.swift in Sources */,
+				A100000001000038 /* CustomPhraseEditor.swift in Sources */,
+				A100000001000039 /* DesignTemplatePicker.swift in Sources */,
+				A100000001000040 /* EventCreateScreen.swift in Sources */,
+				A100000001000041 /* EventCreateViewModel.swift in Sources */,
+				A100000001000042 /* EventPreviewSection.swift in Sources */,
+				A100000001000043 /* PhraseTemplatePicker.swift in Sources */,
+				A100000001000044 /* EmptyStateView.swift in Sources */,
+				A100000001000045 /* EventActionSheet.swift in Sources */,
+				A100000001000046 /* EventCardView.swift in Sources */,
+				A100000001000047 /* EventListScreen.swift in Sources */,
+				A100000001000048 /* EventListViewModel.swift in Sources */,
+				A100000001000049 /* PhotoPickerScreen.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
 /* Begin XCBuildConfiguration section */
-		00000000000000000000004 /* Debug */ = {
+		F100000001000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F100000001000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F100000001000021 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = HiBiPic/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HiBiPic;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hibipic.app;
-				PRODUCT_NAME = HiBiPic;
-				SWIFT_VERSION = 5.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
-		00000000000000000000005 /* Release */ = {
+		F100000001000022 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = HiBiPic/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HiBiPic;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hibipic.app;
-				PRODUCT_NAME = HiBiPic;
-				SWIFT_VERSION = 5.9;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -87,11 +670,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00000000000000000000003 /* Build configuration list for PBXProject */ = {
+		F100000001000001 /* Build configuration list for PBXProject "HiBiPic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				00000000000000000000004 /* Debug */,
-				00000000000000000000005 /* Release */,
+				F100000001000011 /* Debug */,
+				F100000001000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F100000001000003 /* Build configuration list for PBXNativeTarget "HiBiPic" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F100000001000021 /* Debug */,
+				F100000001000022 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -99,5 +691,5 @@
 /* End XCConfigurationList section */
 
 	};
-	rootObject = 00000000000000000000002 /* Project object */;
+	rootObject = E100000001000000 /* Project object */;
 }
