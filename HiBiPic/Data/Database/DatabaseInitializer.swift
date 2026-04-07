@@ -9,7 +9,7 @@ final class DatabaseInitializer {
 
     /// Current schema version. Bump this and add a corresponding migration
     /// closure to `migrations` whenever the schema changes.
-    private static let currentVersion: Int32 = 1
+    private static let currentVersion: Int32 = 2
 
     // MARK: - Public Entry Point
 
@@ -54,8 +54,19 @@ final class DatabaseInitializer {
             );
             """
 
+        let createSavedImagesSQL = """
+            CREATE TABLE IF NOT EXISTS saved_images (
+                id          TEXT PRIMARY KEY,
+                event_id    TEXT NOT NULL,
+                file_name   TEXT NOT NULL,
+                created_at  TEXT NOT NULL,
+                FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+            );
+            """
+
         executeRaw(db: db, sql: createEventsSQL)
         executeRaw(db: db, sql: createSettingsSQL)
+        executeRaw(db: db, sql: createSavedImagesSQL)
     }
 
     // MARK: - Index Creation
@@ -66,6 +77,8 @@ final class DatabaseInitializer {
             "CREATE INDEX IF NOT EXISTS idx_events_is_pinned   ON events (is_pinned);",
             "CREATE INDEX IF NOT EXISTS idx_events_last_used   ON events (last_used_at);",
             "CREATE INDEX IF NOT EXISTS idx_events_updated     ON events (updated_at);",
+            "CREATE INDEX IF NOT EXISTS idx_saved_images_event_id   ON saved_images (event_id);",
+            "CREATE INDEX IF NOT EXISTS idx_saved_images_created_at ON saved_images (created_at);",
         ]
 
         for sql in indices {
@@ -97,10 +110,19 @@ final class DatabaseInitializer {
         1: { _ in
             // No-op: baseline schema already handled by CREATE TABLE IF NOT EXISTS.
         },
-        // Future migrations:
-        // 2: { db in
-        //     executeRaw(db: db, sql: "ALTER TABLE events ADD COLUMN new_col TEXT;")
-        // },
+        2: { db in
+            executeRaw(db: db, sql: """
+                CREATE TABLE IF NOT EXISTS saved_images (
+                    id          TEXT PRIMARY KEY,
+                    event_id    TEXT NOT NULL,
+                    file_name   TEXT NOT NULL,
+                    created_at  TEXT NOT NULL,
+                    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+                );
+                """)
+            executeRaw(db: db, sql: "CREATE INDEX IF NOT EXISTS idx_saved_images_event_id   ON saved_images (event_id);")
+            executeRaw(db: db, sql: "CREATE INDEX IF NOT EXISTS idx_saved_images_created_at ON saved_images (created_at);")
+        },
     ]
 
     // MARK: - Pragma Helpers

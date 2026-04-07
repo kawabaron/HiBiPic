@@ -45,15 +45,16 @@ struct EditorScreen: View {
         .overlay {
             if viewModel.showSaveSuccess {
                 SaveSuccessView(
+                    onSaveToPhotos: {
+                        Task {
+                            await viewModel.saveRenderedToPhotoLibrary()
+                        }
+                    },
                     onShare: {
                         viewModel.showSaveSuccess = false
                         viewModel.showShareSheet = true
                     },
-                    onEditAnother: {
-                        viewModel.showSaveSuccess = false
-                        dismiss()
-                    },
-                    onBackToList: {
+                    onBackToLibrary: {
                         viewModel.showSaveSuccess = false
                         dismiss()
                     }

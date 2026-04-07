@@ -16,6 +16,7 @@ final class AppDependencies {
 
     lazy var eventRepository: EventRepositoryProtocol = EventRepositoryImpl()
     lazy var settingsRepository: SettingsRepositoryProtocol = SettingsRepositoryImpl()
+    lazy var savedImageRepository: SavedImageRepositoryProtocol = SavedImageRepositoryImpl()
 
     // MARK: - Init
 

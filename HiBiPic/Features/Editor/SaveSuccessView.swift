@@ -7,17 +7,18 @@ struct SaveSuccessView: View {
 
     // MARK: - Callbacks
 
+    /// Saves the image to iPhone's photo library.
+    let onSaveToPhotos: () -> Void
     /// Opens the share sheet to share the saved image.
     let onShare: () -> Void
-    /// Navigates back to photo selection to edit another image.
-    let onEditAnother: () -> Void
-    /// Returns to the event list.
-    let onBackToList: () -> Void
+    /// Returns to the library screen.
+    let onBackToLibrary: () -> Void
 
     // MARK: - State
 
     @State private var showCheckmark = false
     @State private var showButtons = false
+    @State private var savedToPhotos = false
 
     // MARK: - Body
 
@@ -40,7 +41,7 @@ struct SaveSuccessView: View {
                         .font(DSTypography.title)
                         .foregroundStyle(.white)
 
-                    Text("写真ライブラリに保存されました")
+                    Text("ライブラリに保存しました")
                         .font(DSTypography.callout)
                         .foregroundStyle(.white.opacity(0.7))
                 }
@@ -50,31 +51,33 @@ struct SaveSuccessView: View {
                 // Action buttons
                 if showButtons {
                     VStack(spacing: DSSpacing.md) {
+                        // Save to iPhone Photos
+                        actionButton(
+                            title: savedToPhotos ? "保存しました" : "iPhoneの写真に保存",
+                            icon: savedToPhotos ? "checkmark" : "square.and.arrow.down",
+                            style: .primary,
+                            disabled: savedToPhotos
+                        ) {
+                            onSaveToPhotos()
+                            savedToPhotos = true
+                        }
+
                         // Share
                         actionButton(
                             title: "共有する",
                             icon: "square.and.arrow.up",
-                            style: .primary
+                            style: .secondary
                         ) {
                             onShare()
                         }
 
-                        // Edit another
+                        // Back to library
                         actionButton(
-                            title: "もう1枚編集",
+                            title: "ライブラリへ戻る",
                             icon: "photo.on.rectangle",
-                            style: .secondary
-                        ) {
-                            onEditAnother()
-                        }
-
-                        // Back to list
-                        actionButton(
-                            title: "一覧へ戻る",
-                            icon: "list.bullet",
                             style: .text
                         ) {
-                            onBackToList()
+                            onBackToLibrary()
                         }
                     }
                     .padding(.horizontal, DSSpacing.xxxl)
@@ -134,6 +137,7 @@ struct SaveSuccessView: View {
         title: String,
         icon: String,
         style: ButtonStyle,
+        disabled: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -145,8 +149,8 @@ struct SaveSuccessView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(minHeight: 48)
-            .foregroundStyle(buttonForeground(style))
-            .background(buttonBackground(style))
+            .foregroundStyle(buttonForeground(style, disabled: disabled))
+            .background(buttonBackground(style, disabled: disabled))
             .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerMd, style: .continuous))
             .overlay {
                 if style == .secondary {
@@ -156,9 +160,11 @@ struct SaveSuccessView: View {
             }
         }
         .buttonStyle(.plain)
+        .disabled(disabled)
     }
 
-    private func buttonForeground(_ style: ButtonStyle) -> Color {
+    private func buttonForeground(_ style: ButtonStyle, disabled: Bool = false) -> Color {
+        if disabled { return .white.opacity(0.5) }
         switch style {
         case .primary:   return .white
         case .secondary: return .white
@@ -167,10 +173,10 @@ struct SaveSuccessView: View {
     }
 
     @ViewBuilder
-    private func buttonBackground(_ style: ButtonStyle) -> some View {
+    private func buttonBackground(_ style: ButtonStyle, disabled: Bool = false) -> some View {
         switch style {
         case .primary:
-            DSColors.accent
+            disabled ? DSColors.accent.opacity(0.5) : DSColors.accent
         case .secondary:
             Color.white.opacity(0.1)
         case .text:
@@ -183,8 +189,8 @@ struct SaveSuccessView: View {
 
 #Preview {
     SaveSuccessView(
+        onSaveToPhotos: {},
         onShare: {},
-        onEditAnother: {},
-        onBackToList: {}
+        onBackToLibrary: {}
     )
 }

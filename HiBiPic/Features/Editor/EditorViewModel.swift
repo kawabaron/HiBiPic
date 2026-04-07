@@ -200,7 +200,7 @@ final class EditorViewModel {
         )
     }
 
-    /// Renders the final image and saves it to the user's photo library.
+    /// Renders the final image and saves it to the app's internal library.
     /// Returns `true` on success.
     @MainActor
     func save() async -> Bool {
@@ -215,17 +215,37 @@ final class EditorViewModel {
 
         renderedImage = finalImage
 
-        let success = await saveToPhotoLibrary(finalImage)
-
-        isSaving = false
-
-        if success {
-            showSaveSuccess = true
-        } else {
-            saveErrorMessage = "写真ライブラリへの保存に失敗しました"
+        // Save to app's internal library
+        let fileName = "\(UUID().uuidString).jpg"
+        let fileSaved = ImageFileStorage.shared.saveImage(finalImage, fileName: fileName)
+        guard fileSaved else {
+            saveErrorMessage = "画像の保存に失敗しました"
+            isSaving = false
+            return false
         }
 
-        return success
+        ImageFileStorage.shared.saveThumbnail(finalImage, fileName: fileName)
+
+        let savedImage = SavedImage(eventId: event.id, fileName: fileName)
+        do {
+            try AppDependencies.shared.savedImageRepository.create(savedImage)
+        } catch {
+            saveErrorMessage = "画像データの保存に失敗しました"
+            isSaving = false
+            return false
+        }
+
+        isSaving = false
+        showSaveSuccess = true
+        return true
+    }
+
+    /// Saves the rendered image to the iPhone's photo library.
+    /// Called from SaveSuccessView.
+    @MainActor
+    func saveRenderedToPhotoLibrary() async -> Bool {
+        guard let image = renderedImage else { return false }
+        return await saveToPhotoLibrary(image)
     }
 
     /// Returns the rendered image for sharing. If not yet rendered, renders on-demand.

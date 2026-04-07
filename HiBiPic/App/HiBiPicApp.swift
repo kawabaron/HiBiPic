@@ -12,13 +12,14 @@ struct HiBiPicApp: App {
         // before any screen tries to read data.
         _ = AppDatabase.shared
         configureAppearance()
+        MainTabView.configureTabBarAppearance()
     }
 
     // MARK: - Scene
 
     var body: some Scene {
         WindowGroup {
-            RootNavigationView()
+            MainTabView()
         }
     }
 

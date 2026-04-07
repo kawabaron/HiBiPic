@@ -57,6 +57,19 @@
 		A100000001000048 /* EventListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000048; };
 		A100000001000049 /* PhotoPickerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000049; };
 		A100000001000050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000050; };
+		A100000001000052 /* SavedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000052; };
+		A100000001000053 /* SavedImageRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000053; };
+		A100000001000054 /* SavedImageLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000054; };
+		A100000001000055 /* SavedImageMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000055; };
+		A100000001000056 /* SavedImageRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000056; };
+		A100000001000057 /* ImageFileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000057; };
+		A100000001000058 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000058; };
+		A100000001000059 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000059; };
+		A100000001000060 /* LibraryGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000060; };
+		A100000001000061 /* LibraryCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000061; };
+		A100000001000062 /* ImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000062; };
+		A100000001000063 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000063; };
+		A100000001000064 /* EventSelectSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000064; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -111,6 +124,19 @@
 		B100000001000049 /* PhotoPickerScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerScreen.swift; sourceTree = "<group>"; };
 		B100000001000050 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B100000001000051 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B100000001000052 /* SavedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImage.swift; sourceTree = "<group>"; };
+		B100000001000053 /* SavedImageRepositoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImageRepositoryProtocol.swift; sourceTree = "<group>"; };
+		B100000001000054 /* SavedImageLocalDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImageLocalDataSource.swift; sourceTree = "<group>"; };
+		B100000001000055 /* SavedImageMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImageMapper.swift; sourceTree = "<group>"; };
+		B100000001000056 /* SavedImageRepositoryImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedImageRepositoryImpl.swift; sourceTree = "<group>"; };
+		B100000001000057 /* ImageFileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFileStorage.swift; sourceTree = "<group>"; };
+		B100000001000058 /* LibraryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryScreen.swift; sourceTree = "<group>"; };
+		B100000001000059 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
+		B100000001000060 /* LibraryGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryGridView.swift; sourceTree = "<group>"; };
+		B100000001000061 /* LibraryCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryCalendarView.swift; sourceTree = "<group>"; };
+		B100000001000062 /* ImageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDetailView.swift; sourceTree = "<group>"; };
+		B100000001000063 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		B100000001000064 /* EventSelectSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSelectSheet.swift; sourceTree = "<group>"; };
 		B100000001000099 /* HiBiPic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiBiPic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -159,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				B100000001000001 /* HiBiPicApp.swift */,
+				B100000001000063 /* MainTabView.swift */,
 				B100000001000002 /* RootNavigationView.swift */,
 				B100000001000003 /* AppDependencies.swift */,
 			);
@@ -213,6 +240,7 @@
 				D100000001000042 /* Database */,
 				D100000001000043 /* Mappers */,
 				D100000001000044 /* Repositories */,
+				D100000001000045 /* Storage */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -221,6 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				B100000001000014 /* EventLocalDataSource.swift */,
+				B100000001000054 /* SavedImageLocalDataSource.swift */,
 				B100000001000015 /* SettingsLocalDataSource.swift */,
 			);
 			path = DataSources;
@@ -239,6 +268,7 @@
 			isa = PBXGroup;
 			children = (
 				B100000001000018 /* EventMapper.swift */,
+				B100000001000055 /* SavedImageMapper.swift */,
 			);
 			path = Mappers;
 			sourceTree = "<group>";
@@ -247,9 +277,18 @@
 			isa = PBXGroup;
 			children = (
 				B100000001000019 /* EventRepositoryImpl.swift */,
+				B100000001000056 /* SavedImageRepositoryImpl.swift */,
 				B100000001000020 /* SettingsRepositoryImpl.swift */,
 			);
 			path = Repositories;
+			sourceTree = "<group>";
+		};
+		D100000001000045 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000057 /* ImageFileStorage.swift */,
+			);
+			path = Storage;
 			sourceTree = "<group>";
 		};
 		D100000001000050 /* Domain */ = {
@@ -269,6 +308,7 @@
 				B100000001000023 /* Event.swift */,
 				B100000001000024 /* EventSortType.swift */,
 				B100000001000025 /* PhraseTemplate.swift */,
+				B100000001000052 /* SavedImage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -277,6 +317,7 @@
 			isa = PBXGroup;
 			children = (
 				B100000001000026 /* EventRepositoryProtocol.swift */,
+				B100000001000053 /* SavedImageRepositoryProtocol.swift */,
 				B100000001000027 /* SettingsRepositoryProtocol.swift */,
 			);
 			path = Repositories;
@@ -286,9 +327,11 @@
 			isa = PBXGroup;
 			children = (
 				D100000001000061 /* Camera */,
+				D100000001000067 /* Capture */,
 				D100000001000062 /* Editor */,
 				D100000001000063 /* EventCreate */,
 				D100000001000064 /* EventList */,
+				D100000001000066 /* Library */,
 				D100000001000065 /* PhotoPicker */,
 			);
 			path = Features;
@@ -349,6 +392,26 @@
 				B100000001000049 /* PhotoPickerScreen.swift */,
 			);
 			path = PhotoPicker;
+			sourceTree = "<group>";
+		};
+		D100000001000066 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000058 /* LibraryScreen.swift */,
+				B100000001000059 /* LibraryViewModel.swift */,
+				B100000001000060 /* LibraryGridView.swift */,
+				B100000001000061 /* LibraryCalendarView.swift */,
+				B100000001000062 /* ImageDetailView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		D100000001000067 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000064 /* EventSelectSheet.swift */,
+			);
+			path = Capture;
 			sourceTree = "<group>";
 		};
 		D100000001000070 /* Resources */ = {
@@ -478,6 +541,19 @@
 				A100000001000047 /* EventListScreen.swift in Sources */,
 				A100000001000048 /* EventListViewModel.swift in Sources */,
 				A100000001000049 /* PhotoPickerScreen.swift in Sources */,
+				A100000001000052 /* SavedImage.swift in Sources */,
+				A100000001000053 /* SavedImageRepositoryProtocol.swift in Sources */,
+				A100000001000054 /* SavedImageLocalDataSource.swift in Sources */,
+				A100000001000055 /* SavedImageMapper.swift in Sources */,
+				A100000001000056 /* SavedImageRepositoryImpl.swift in Sources */,
+				A100000001000057 /* ImageFileStorage.swift in Sources */,
+				A100000001000058 /* LibraryScreen.swift in Sources */,
+				A100000001000059 /* LibraryViewModel.swift in Sources */,
+				A100000001000060 /* LibraryGridView.swift in Sources */,
+				A100000001000061 /* LibraryCalendarView.swift in Sources */,
+				A100000001000062 /* ImageDetailView.swift in Sources */,
+				A100000001000063 /* MainTabView.swift in Sources */,
+				A100000001000064 /* EventSelectSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

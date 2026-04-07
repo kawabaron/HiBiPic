@@ -6,93 +6,63 @@ import SwiftUI
 /// Central navigation state for the entire app.
 ///
 /// Manages which modal (sheet / fullScreenCover) is presented and
-/// carries the transient data flowing between screens:
-///
-///     List -> Create/Edit (sheet)
-///     List -> Camera (fullScreenCover)
-///     List -> PhotoPicker (sheet)
-///     Camera/PhotoPicker -> Editor (fullScreenCover)
-///     Editor -> Save Success -> back to List
-///
+/// carries the transient data flowing between screens.
 @Observable
 final class NavigationCoordinator {
 
     // MARK: - Sheet / Cover Presentations
 
-    /// Controls the EventCreate sheet.
     var showCreateEvent = false
-
-    /// Controls the Camera full-screen cover.
     var showCamera = false
-
-    /// Controls the PhotoPicker sheet.
     var showPhotoPicker = false
-
-    /// Controls the Editor full-screen cover.
     var showEditor = false
 
     // MARK: - Transient Data
 
-    /// The event currently being edited (EventCreate in edit mode).
     var editingEvent: Event?
-
-    /// The event selected for the camera / photo-picker flow.
     var selectedEvent: Event?
-
-    /// Image captured by the camera, waiting to move into the editor.
     var capturedImage: UIImage?
-
-    /// Image selected from the photo library, waiting to move into the editor.
     var selectedImage: UIImage?
 
     // MARK: - Navigation Methods
 
-    /// Present the EventCreate sheet in creation mode.
     func navigateToCreateEvent() {
         editingEvent = nil
         showCreateEvent = true
     }
 
-    /// Present the EventCreate sheet pre-populated for editing.
     func navigateToEditEvent(_ event: Event) {
         editingEvent = event
         showCreateEvent = true
     }
 
-    /// Present the Camera full-screen cover for the given event.
     func navigateToCamera(event: Event) {
         selectedEvent = event
         showCamera = true
     }
 
-    /// Present the PhotoPicker sheet for the given event.
     func navigateToPhotoPicker(event: Event) {
         selectedEvent = event
         showPhotoPicker = true
     }
 
-    /// Present the Editor full-screen cover with the given image and event.
     func navigateToEditor(image: UIImage, event: Event) {
         capturedImage = image
         selectedEvent = event
         showEditor = true
     }
 
-    /// Dismiss everything and return to the event list.
     func returnToList() {
         showEditor = false
         showCamera = false
         showPhotoPicker = false
         showCreateEvent = false
 
-        // Clear transient state after a short delay so dismiss
-        // animations complete before the data is nilled out.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
             self?.clearTransientState()
         }
     }
 
-    /// Full reset -- dismisses all modals and clears all state.
     func reset() {
         showCreateEvent = false
         showCamera = false
@@ -113,19 +83,22 @@ final class NavigationCoordinator {
 
 // MARK: - RootNavigationView
 
-/// The app's root view. Hosts the `EventListScreen` and coordinates all
-/// modal presentations (sheets and full-screen covers) through a single
-/// `NavigationCoordinator` instance.
+/// The events tab content. Displays the event list with action sheets,
+/// swipe actions, and toolbar. Modal presentations are handled by MainTabView.
 struct RootNavigationView: View {
 
     // MARK: - State
 
-    @State private var coordinator = NavigationCoordinator()
+    @Bindable var coordinator: NavigationCoordinator
     @State private var viewModel = EventListViewModel()
 
     /// The event shown in the custom action sheet overlay.
     @State private var actionSheetEvent: Event?
     @State private var showActionSheet = false
+
+    /// Navigation to event-filtered library.
+    @State private var showEventLibrary = false
+    @State private var eventForLibrary: Event?
 
     // MARK: - Body
 
@@ -136,7 +109,7 @@ struct RootNavigationView: View {
                     .ignoresSafeArea()
 
                 eventListContent
-                    .navigationTitle("HiBiPic")
+                    .navigationTitle("イベント")
                     .toolbar { toolbarItems }
                     .alert(
                         "イベントを削除",
@@ -156,101 +129,23 @@ struct RootNavigationView: View {
                     actionSheetOverlay(for: event)
                 }
             }
+            .navigationDestination(isPresented: $showEventLibrary) {
+                if let event = eventForLibrary {
+                    LibraryScreen(
+                        eventId: event.id,
+                        onCaptureForEvent: { event in
+                            coordinator.navigateToCamera(event: event)
+                        },
+                        onPickPhotoForEvent: { event in
+                            coordinator.navigateToPhotoPicker(event: event)
+                        }
+                    )
+                }
+            }
         }
         .onAppear {
             viewModel.loadEvents()
         }
-
-        // MARK: - Sheet: Event Create / Edit
-
-        .sheet(isPresented: $coordinator.showCreateEvent, onDismiss: {
-            coordinator.editingEvent = nil
-            viewModel.loadEvents()
-        }) {
-            NavigationStack {
-                EventCreateScreen(event: coordinator.editingEvent)
-            }
-            .interactiveDismissDisabled(false)
-        }
-
-        // MARK: - Sheet: Photo Picker
-
-        .sheet(isPresented: $coordinator.showPhotoPicker, onDismiss: {
-            // If an image was selected the coordinator already opened the editor.
-        }) {
-            if let event = coordinator.selectedEvent {
-                PhotoPickerScreen(
-                    event: event,
-                    selectedImage: Binding(
-                        get: { coordinator.selectedImage },
-                        set: { coordinator.selectedImage = $0 }
-                    ),
-                    isPresented: $coordinator.showPhotoPicker,
-                    onImageSelected: { image in
-                        // Dismiss the picker, then present the editor.
-                        coordinator.showPhotoPicker = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            coordinator.navigateToEditor(image: image, event: event)
-                        }
-                    }
-                )
-            }
-        }
-
-        // MARK: - FullScreenCover: Camera
-
-        .fullScreenCover(isPresented: $coordinator.showCamera) {
-            if let event = coordinator.selectedEvent {
-                CameraScreen(
-                    event: event,
-                    onImageCaptured: { image in
-                        // Dismiss the camera, then present the editor.
-                        coordinator.showCamera = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            coordinator.navigateToEditor(image: image, event: event)
-                        }
-                    },
-                    onPickerRequested: {
-                        // From the camera the user wants the photo library instead.
-                        coordinator.showCamera = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            coordinator.navigateToPhotoPicker(event: event)
-                        }
-                    },
-                    onDismiss: {
-                        coordinator.showCamera = false
-                    }
-                )
-            }
-        }
-
-        // MARK: - FullScreenCover: Editor
-
-        .fullScreenCover(isPresented: $coordinator.showEditor, onDismiss: {
-            coordinator.capturedImage = nil
-            coordinator.selectedImage = nil
-            viewModel.loadEvents()
-        }) {
-            if let image = coordinator.capturedImage,
-               let event = coordinator.selectedEvent {
-                editorView(image: image, event: event)
-            }
-        }
-    }
-
-    // MARK: - Editor View Builder
-
-    /// Builds an `EditorScreen` with its `EditorViewModel`.
-    ///
-    /// The editor's "Back to list" and "Edit another" buttons both call
-    /// `dismiss()`, which dismisses the full-screen cover and triggers
-    /// the `onDismiss` closure above -- reloading events and clearing
-    /// transient state. No additional wiring is needed.
-    @ViewBuilder
-    private func editorView(image: UIImage, event: Event) -> some View {
-        EditorScreen(
-            viewModel: EditorViewModel(image: image, event: event)
-        )
     }
 
     // MARK: - Event List Content
@@ -277,7 +172,6 @@ struct RootNavigationView: View {
 
     private var eventList: some View {
         List {
-            // Error banner
             if let error = viewModel.errorMessage {
                 errorBanner(error)
                     .listRowSeparator(.hidden)
@@ -290,7 +184,6 @@ struct RootNavigationView: View {
                     ))
             }
 
-            // Pinned section
             if !viewModel.pinnedEvents.isEmpty {
                 Section {
                     ForEach(viewModel.pinnedEvents) { event in
@@ -301,7 +194,6 @@ struct RootNavigationView: View {
                 }
             }
 
-            // Regular events section
             if !viewModel.unpinnedEvents.isEmpty {
                 Section {
                     ForEach(viewModel.unpinnedEvents) { event in
@@ -343,10 +235,8 @@ struct RootNavigationView: View {
 
     private func eventCard(for event: Event) -> some View {
         EventCardView(event: event) {
-            actionSheetEvent = event
-            withAnimation(.easeInOut(duration: 0.25)) {
-                showActionSheet = true
-            }
+            eventForLibrary = event
+            showEventLibrary = true
         }
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
@@ -526,6 +416,6 @@ struct RootNavigationView: View {
 
 // MARK: - Preview
 
-#Preview("Root Navigation") {
-    RootNavigationView()
+#Preview("Events Tab") {
+    RootNavigationView(coordinator: NavigationCoordinator())
 }
