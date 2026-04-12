@@ -1,5 +1,6 @@
 import SwiftUI
 import Photos
+import UIKit
 
 // MARK: - ImageDetailView
 
@@ -21,6 +22,7 @@ struct ImageDetailView: View {
     @State private var dismissDragOffset: CGFloat = 0
     @State private var reeditViewModel: EditorViewModel?
     @State private var reeditErrorMessage: String?
+    @State private var zoomedImageIDs: Set<String> = []
 
     init(
         images: [SavedImage],
@@ -176,11 +178,18 @@ struct ImageDetailView: View {
             } else {
                 TabView(selection: $currentImageID) {
                     ForEach(galleryImages) { image in
-                        ZoomableLibraryImageView(image: image)
+                        ZoomableLibraryImageView(image: image) { imageID, isZoomed in
+                            if isZoomed {
+                                zoomedImageIDs.insert(imageID)
+                            } else {
+                                zoomedImageIDs.remove(imageID)
+                            }
+                        }
                             .tag(image.id)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .automatic))
+                .scrollDisabled(isCurrentImageZoomed)
             }
         }
         .frame(maxHeight: .infinity)
@@ -198,6 +207,10 @@ struct ImageDetailView: View {
 
     private var reeditButtonTitle: String {
         currentImage?.supportsFullReedit == true ? L10n.t("再編集") : L10n.t("再編集（簡易）")
+    }
+
+    private var isCurrentImageZoomed: Bool {
+        zoomedImageIDs.contains(currentImageID)
     }
 
     // MARK: - State Sync
@@ -239,6 +252,7 @@ struct ImageDetailView: View {
         onDelete(currentImage)
 
         galleryImages.removeAll { $0.id == currentImage.id }
+        zoomedImageIDs.remove(currentImage.id)
 
         guard !galleryImages.isEmpty else {
             dismiss()
@@ -252,6 +266,7 @@ struct ImageDetailView: View {
     private var dismissGesture: some Gesture {
         DragGesture(minimumDistance: 16)
             .onChanged { value in
+                guard !isCurrentImageZoomed else { return }
                 guard value.translation.height > 0,
                       abs(value.translation.height) > abs(value.translation.width)
                 else { return }
@@ -259,6 +274,11 @@ struct ImageDetailView: View {
                 dismissDragOffset = value.translation.height
             }
             .onEnded { value in
+                guard !isCurrentImageZoomed else {
+                    dismissDragOffset = 0
+                    return
+                }
+
                 let shouldDismiss = value.translation.height > 120
                     && abs(value.translation.height) > abs(value.translation.width)
 
@@ -308,23 +328,22 @@ struct ImageDetailView: View {
 private struct ZoomableLibraryImageView: View {
 
     let image: SavedImage
+    let onZoomStateChanged: (String, Bool) -> Void
 
     @State private var uiImage: UIImage?
-    @State private var zoomScale: CGFloat = 1.0
-    @State private var lastZoomScale: CGFloat = 1.0
 
     var body: some View {
         GeometryReader { geo in
             Group {
                 if let uiImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .scaleEffect(zoomScale)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                        .contentShape(Rectangle())
-                        .gesture(doubleTapGesture)
-                        .simultaneousGesture(magnificationGesture)
+                    ZoomableImageScrollView(
+                        image: uiImage,
+                        imageID: image.id
+                    ) { isZoomed in
+                        onZoomStateChanged(image.id, isZoomed)
+                    }
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .contentShape(Rectangle())
                 } else {
                     Rectangle()
                         .fill(DSColors.secondaryBackground)
@@ -344,32 +363,213 @@ private struct ZoomableLibraryImageView: View {
             }
         }
         .onChange(of: image.id) { _, _ in
-            zoomScale = 1.0
-            lastZoomScale = 1.0
+            onZoomStateChanged(image.id, false)
             uiImage = ImageFileStorage.shared.loadImage(fileName: image.fileName)
         }
+        .onDisappear {
+            onZoomStateChanged(image.id, false)
+        }
+    }
+}
+
+// MARK: - ZoomableImageScrollView
+
+private struct ZoomableImageScrollView: UIViewRepresentable {
+
+    let image: UIImage
+    let imageID: String
+    let onZoomStateChanged: (Bool) -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onZoomStateChanged: onZoomStateChanged)
     }
 
-    private var magnificationGesture: some Gesture {
-        MagnificationGesture()
-            .onChanged { value in
-                zoomScale = min(max(lastZoomScale * value, 1.0), 4.0)
-            }
-            .onEnded { _ in
-                withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
-                    zoomScale = min(max(zoomScale, 1.0), 4.0)
-                    lastZoomScale = zoomScale
-                }
-            }
+    func makeUIView(context: Context) -> UIScrollView {
+        let scrollView = UIScrollView()
+        scrollView.delegate = context.coordinator
+        scrollView.backgroundColor = .clear
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 4.0
+        scrollView.bouncesZoom = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.clipsToBounds = true
+
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
+        scrollView.addSubview(imageView)
+
+        let doubleTapGesture = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleDoubleTap(_:))
+        )
+        doubleTapGesture.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTapGesture)
+
+        context.coordinator.attach(scrollView: scrollView, imageView: imageView)
+        context.coordinator.update(
+            image: image,
+            imageID: imageID,
+            onZoomStateChanged: onZoomStateChanged
+        )
+
+        return scrollView
     }
 
-    private var doubleTapGesture: some Gesture {
-        TapGesture(count: 2)
-            .onEnded {
-                withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
-                    zoomScale = zoomScale > 1.0 ? 1.0 : 2.5
-                    lastZoomScale = zoomScale
-                }
+    func updateUIView(_ scrollView: UIScrollView, context: Context) {
+        context.coordinator.update(
+            image: image,
+            imageID: imageID,
+            onZoomStateChanged: onZoomStateChanged
+        )
+    }
+
+    final class Coordinator: NSObject, UIScrollViewDelegate {
+
+        private weak var scrollView: UIScrollView?
+        private weak var imageView: UIImageView?
+        private var currentImageID: String?
+        private var onZoomStateChanged: (Bool) -> Void
+        private var isZoomed = false
+        private var lastBoundsSize: CGSize = .zero
+
+        init(onZoomStateChanged: @escaping (Bool) -> Void) {
+            self.onZoomStateChanged = onZoomStateChanged
+        }
+
+        func attach(scrollView: UIScrollView, imageView: UIImageView) {
+            self.scrollView = scrollView
+            self.imageView = imageView
+        }
+
+        func update(
+            image: UIImage,
+            imageID: String,
+            onZoomStateChanged: @escaping (Bool) -> Void
+        ) {
+            self.onZoomStateChanged = onZoomStateChanged
+
+            guard let scrollView, let imageView else { return }
+
+            let imageDidChange = currentImageID != imageID
+            currentImageID = imageID
+
+            if imageView.image !== image {
+                imageView.image = image
             }
+
+            if imageDidChange {
+                scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
+                scrollView.contentOffset = .zero
+                notifyZoomState(false)
+            }
+
+            DispatchQueue.main.async { [weak self] in
+                self?.updateLayoutIfNeeded(resetZoom: imageDidChange)
+            }
+        }
+
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            imageView
+        }
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            centerImage()
+            notifyZoomState(scrollView.zoomScale > scrollView.minimumZoomScale + 0.01)
+        }
+
+        func scrollViewDidEndZooming(
+            _ scrollView: UIScrollView,
+            with view: UIView?,
+            atScale scale: CGFloat
+        ) {
+            notifyZoomState(scale > scrollView.minimumZoomScale + 0.01)
+        }
+
+        @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+            guard let scrollView, let imageView else { return }
+
+            if scrollView.zoomScale > scrollView.minimumZoomScale + 0.01 {
+                scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+                return
+            }
+
+            let targetZoomScale = min(2.5, scrollView.maximumZoomScale)
+            let tapLocation = gesture.location(in: imageView)
+            let zoomRect = zoomRect(
+                around: tapLocation,
+                scale: targetZoomScale,
+                in: scrollView
+            )
+
+            scrollView.zoom(to: zoomRect, animated: true)
+        }
+
+        private func updateLayoutIfNeeded(resetZoom: Bool) {
+            guard let scrollView, let imageView else { return }
+            guard scrollView.bounds.width > 0, scrollView.bounds.height > 0 else { return }
+
+            let boundsSize = scrollView.bounds.size
+            let boundsDidChange = lastBoundsSize != boundsSize
+
+            guard resetZoom || boundsDidChange else { return }
+
+            lastBoundsSize = boundsSize
+
+            if boundsDidChange && !resetZoom {
+                scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
+                scrollView.contentOffset = .zero
+                notifyZoomState(false)
+            }
+
+            imageView.frame = CGRect(origin: .zero, size: scrollView.bounds.size)
+            scrollView.contentSize = imageView.frame.size
+            centerImage()
+        }
+
+        private func centerImage() {
+            guard let scrollView, let imageView else { return }
+
+            let boundsSize = scrollView.bounds.size
+            var frame = imageView.frame
+
+            frame.origin.x = frame.width < boundsSize.width
+                ? (boundsSize.width - frame.width) / 2
+                : 0
+            frame.origin.y = frame.height < boundsSize.height
+                ? (boundsSize.height - frame.height) / 2
+                : 0
+
+            imageView.frame = frame
+        }
+
+        private func notifyZoomState(_ newValue: Bool) {
+            guard isZoomed != newValue else { return }
+            isZoomed = newValue
+            DispatchQueue.main.async { [onZoomStateChanged] in
+                onZoomStateChanged(newValue)
+            }
+        }
+
+        private func zoomRect(
+            around point: CGPoint,
+            scale: CGFloat,
+            in scrollView: UIScrollView
+        ) -> CGRect {
+            let size = CGSize(
+                width: scrollView.bounds.width / scale,
+                height: scrollView.bounds.height / scale
+            )
+
+            return CGRect(
+                x: point.x - (size.width / 2),
+                y: point.y - (size.height / 2),
+                width: size.width,
+                height: size.height
+            )
+        }
     }
 }
