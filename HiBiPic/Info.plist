@@ -39,11 +39,11 @@
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>編集した写真を保存するために使用します</string>
     <key>HiBiPicTermsOfServiceURL</key>
-    <string></string>
+    <string>https://kawabaron.github.io/HiBiPic/terms.html</string>
     <key>HiBiPicContactURL</key>
-    <string></string>
+    <string>https://kawabaron.github.io/HiBiPic/contact.html</string>
     <key>HiBiPicPrivacyPolicyURL</key>
-    <string></string>
+    <string>https://kawabaron.github.io/HiBiPic/privacy.html</string>
     <key>UIAppFonts</key>
     <array>
         <string>KleeOne-Regular.ttf</string>

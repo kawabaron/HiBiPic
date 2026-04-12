@@ -32,10 +32,6 @@ struct SettingsScreen: View {
                     appearanceSection
                     languageSection
                     supportSection
-
-                    if missingLinkCount > 0 {
-                        missingLinkNotice
-                    }
                 }
                 .padding(.horizontal, DSSpacing.lg)
                 .padding(.top, DSSpacing.lg)
@@ -109,20 +105,6 @@ struct SettingsScreen: View {
                 }
             }
         }
-    }
-
-    private var missingLinkNotice: some View {
-        HStack(spacing: DSSpacing.sm) {
-            Image(systemName: "info.circle.fill")
-                .foregroundStyle(DSColors.warning)
-
-            Text(L10n.t("一部のリンク先はまだ設定されていないため、準備でき次第そのまま差し替えられます。"))
-                .font(DSTypography.footnote)
-                .foregroundStyle(DSColors.textSecondary)
-        }
-        .padding(DSSpacing.md)
-        .background(DSColors.warning.opacity(0.12))
-        .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerMd, style: .continuous))
     }
 
     private func sectionHeader(
@@ -271,10 +253,6 @@ struct SettingsScreen: View {
         }
 
         return URL(string: trimmedValue)
-    }
-
-    private var missingLinkCount: Int {
-        SettingsLinkItem.allCases.filter { configuredURL(forKey: $0.infoPlistKey) == nil }.count
     }
 
     private func persistAppearanceMode(_ mode: AppAppearanceMode) {
