@@ -10,8 +10,6 @@ struct LibraryCalendarView: View {
 
     @State private var selectedDate: String?
 
-    private let calendar = Calendar(identifier: .gregorian)
-    private let weekdayLabels = ["日", "月", "火", "水", "木", "金", "土"]
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
 
     var body: some View {
@@ -186,7 +184,7 @@ struct LibraryCalendarView: View {
                 }
 
                 if dayImages.isEmpty && events.isEmpty {
-                    Text("この日のデータはありません")
+                    Text(L10n.t("この日のデータはありません"))
                         .font(DSTypography.subheadline)
                         .foregroundStyle(DSColors.textTertiary)
                 } else if !dayImages.isEmpty {
@@ -242,11 +240,23 @@ struct LibraryCalendarView: View {
         return days
     }
 
+    private var calendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = AppLocalizer.currentLanguage.locale
+        return calendar
+    }
+
+    private var weekdayLabels: [String] {
+        let formatter = DateFormatter()
+        formatter.locale = AppLocalizer.currentLanguage.locale
+        return formatter.veryShortStandaloneWeekdaySymbols ?? formatter.veryShortWeekdaySymbols
+    }
+
     private func formattedDate(_ dateString: String) -> String {
         guard let date = DateCalculator.baseDateFromString(dateString) else { return dateString }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "M月d日 (E)"
+        formatter.locale = AppLocalizer.currentLanguage.locale
+        formatter.setLocalizedDateFormatFromTemplate("MMMdEEE")
         return formatter.string(from: date)
     }
 }

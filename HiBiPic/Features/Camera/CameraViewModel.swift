@@ -12,6 +12,7 @@ final class CameraViewModel: NSObject {
     var isCapturing = false
     var isCameraReady = false
     var cameraError: String?
+    var cameraAccessDenied = false
     var currentEvent: Event?
 
     // MARK: - Session
@@ -59,7 +60,7 @@ final class CameraViewModel: NSObject {
         // Discover the camera device
         guard let device = cameraDevice(for: currentCameraPosition) else {
             session.commitConfiguration()
-            cameraError = "カメラデバイスが見つかりません"
+            cameraError = L10n.t("カメラデバイスが見つかりません")
             return
         }
 
@@ -70,12 +71,12 @@ final class CameraViewModel: NSObject {
                 session.addInput(input)
             } else {
                 session.commitConfiguration()
-                cameraError = "カメラ入力を追加できません"
+                cameraError = L10n.t("カメラ入力を追加できません")
                 return
             }
         } catch {
             session.commitConfiguration()
-            cameraError = "カメラの初期化に失敗しました: \(error.localizedDescription)"
+            cameraError = L10n.f("カメラの初期化に失敗しました: %@", error.localizedDescription)
             return
         }
 
@@ -87,7 +88,7 @@ final class CameraViewModel: NSObject {
                 photoOutput.maxPhotoQualityPrioritization = .quality
             } else {
                 session.commitConfiguration()
-                cameraError = "写真出力を追加できません"
+                cameraError = L10n.t("写真出力を追加できません")
                 return
             }
         }
@@ -143,7 +144,7 @@ final class CameraViewModel: NSObject {
 
         guard let device = cameraDevice(for: currentCameraPosition) else {
             session.commitConfiguration()
-            cameraError = "カメラの切り替えに失敗しました"
+            cameraError = L10n.t("カメラの切り替えに失敗しました")
             return
         }
 
@@ -153,7 +154,7 @@ final class CameraViewModel: NSObject {
                 session.addInput(input)
             }
         } catch {
-            cameraError = "カメラの切り替えに失敗しました: \(error.localizedDescription)"
+            cameraError = L10n.f("カメラの切り替えに失敗しました: %@", error.localizedDescription)
         }
 
         session.commitConfiguration()
@@ -201,7 +202,7 @@ extension CameraViewModel: AVCapturePhotoCaptureDelegate {
         }
 
         if let error {
-            cameraError = "写真の撮影に失敗しました: \(error.localizedDescription)"
+            cameraError = L10n.f("写真の撮影に失敗しました: %@", error.localizedDescription)
             photoContinuation?.resume(returning: nil)
             photoContinuation = nil
             return
@@ -210,7 +211,7 @@ extension CameraViewModel: AVCapturePhotoCaptureDelegate {
         guard let data = photo.fileDataRepresentation(),
               let image = UIImage(data: data)
         else {
-            cameraError = "写真データの変換に失敗しました"
+            cameraError = L10n.t("写真データの変換に失敗しました")
             photoContinuation?.resume(returning: nil)
             photoContinuation = nil
             return

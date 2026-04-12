@@ -57,7 +57,7 @@ private struct DSToastBanner: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(item.style.tintColor)
 
-            Text(item.message)
+            Text(L10n.t(item.message))
                 .font(DSTypography.subheadline)
                 .foregroundStyle(DSColors.textPrimary)
                 .lineLimit(2)

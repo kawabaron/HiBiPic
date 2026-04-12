@@ -7,6 +7,8 @@ struct SavedImageRow {
     let id: String
     let eventId: String
     let fileName: String
+    let originalFileName: String?
+    let editRecipeJSON: String?
     let createdAt: String
 }
 
@@ -91,6 +93,8 @@ private extension SavedImageRow {
             "id": id,
             "event_id": eventId,
             "file_name": fileName,
+            "original_file_name": originalFileName,
+            "edit_recipe_json": editRecipeJSON,
             "created_at": createdAt,
         ]
     }
@@ -108,6 +112,8 @@ private extension SavedImageRow {
         self.id = id
         self.eventId = eventId
         self.fileName = fileName
+        self.originalFileName = dict["original_file_name"] as? String
+        self.editRecipeJSON = dict["edit_recipe_json"] as? String
         self.createdAt = createdAt
     }
 }

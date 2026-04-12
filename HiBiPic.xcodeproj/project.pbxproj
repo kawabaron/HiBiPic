@@ -7,69 +7,81 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A100000001000001 /* HiBiPicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000001; };
-		A100000001000002 /* RootNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000002; };
-		A100000001000003 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000003; };
-		A100000001000004 /* DSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000004; };
-		A100000001000005 /* DSCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000005; };
-		A100000001000006 /* DSSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000006; };
-		A100000001000007 /* DSTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000007; };
-		A100000001000008 /* DSToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000008; };
-		A100000001000009 /* DSColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000009; };
-		A100000001000010 /* DSShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000010; };
-		A100000001000011 /* DSSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000011; };
-		A100000001000012 /* DSTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000012; };
-		A100000001000013 /* DateCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000013; };
-		A100000001000014 /* EventLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000014; };
-		A100000001000015 /* SettingsLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000015; };
-		A100000001000016 /* AppDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000016; };
-		A100000001000017 /* DatabaseInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000017; };
-		A100000001000018 /* EventMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000018; };
-		A100000001000019 /* EventRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000019; };
-		A100000001000020 /* SettingsRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000020; };
-		A100000001000021 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000021; };
-		A100000001000022 /* DesignTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000022; };
-		A100000001000023 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000023; };
-		A100000001000024 /* EventSortType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000024; };
-		A100000001000025 /* PhraseTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000025; };
-		A100000001000026 /* EventRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000026; };
-		A100000001000027 /* SettingsRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000027; };
-		A100000001000028 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000028; };
-		A100000001000029 /* CameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000029; };
-		A100000001000030 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000030; };
-		A100000001000031 /* EditorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000031; };
-		A100000001000032 /* EditorToolPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000032; };
-		A100000001000033 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000033; };
-		A100000001000034 /* ImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000034; };
-		A100000001000035 /* SaveSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000035; };
-		A100000001000036 /* ShareSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000036; };
-		A100000001000037 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000037; };
-		A100000001000038 /* CustomPhraseEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000038; };
-		A100000001000039 /* DesignTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000039; };
-		A100000001000040 /* EventCreateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000040; };
-		A100000001000041 /* EventCreateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000041; };
-		A100000001000042 /* EventPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000042; };
-		A100000001000043 /* PhraseTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000043; };
-		A100000001000044 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000044; };
-		A100000001000045 /* EventActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000045; };
-		A100000001000046 /* EventCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000046; };
-		A100000001000047 /* EventListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000047; };
-		A100000001000048 /* EventListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000048; };
-		A100000001000049 /* PhotoPickerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000049; };
-		A100000001000050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000050; };
-		A100000001000052 /* SavedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000052; };
-		A100000001000053 /* SavedImageRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000053; };
-		A100000001000054 /* SavedImageLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000054; };
-		A100000001000055 /* SavedImageMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000055; };
-		A100000001000056 /* SavedImageRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000056; };
-		A100000001000057 /* ImageFileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000057; };
-		A100000001000058 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000058; };
-		A100000001000059 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000059; };
-		A100000001000060 /* LibraryGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000060; };
-		A100000001000061 /* LibraryCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000061; };
-		A100000001000062 /* ImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000062; };
-		A100000001000063 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000063; };
-		A100000001000064 /* EventSelectSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000064; };
+		A100000001000001 /* HiBiPicApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000001 /* HiBiPicApp.swift */; };
+		A100000001000002 /* RootNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000002 /* RootNavigationView.swift */; };
+		A100000001000003 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000003 /* AppDependencies.swift */; };
+		A100000001000004 /* DSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000004 /* DSButton.swift */; };
+		A100000001000005 /* DSCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000005 /* DSCard.swift */; };
+		A100000001000006 /* DSSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000006 /* DSSegmentedControl.swift */; };
+		A100000001000007 /* DSTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000007 /* DSTextField.swift */; };
+		A100000001000008 /* DSToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000008 /* DSToast.swift */; };
+		A100000001000009 /* DSColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000009 /* DSColors.swift */; };
+		A100000001000010 /* DSShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000010 /* DSShadow.swift */; };
+		A100000001000011 /* DSSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000011 /* DSSpacing.swift */; };
+		A100000001000012 /* DSTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000012 /* DSTypography.swift */; };
+		A100000001000013 /* DateCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000013 /* DateCalculator.swift */; };
+		A100000001000014 /* EventLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000014 /* EventLocalDataSource.swift */; };
+		A100000001000015 /* SettingsLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000015 /* SettingsLocalDataSource.swift */; };
+		A100000001000016 /* AppDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000016 /* AppDatabase.swift */; };
+		A100000001000017 /* DatabaseInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000017 /* DatabaseInitializer.swift */; };
+		A100000001000018 /* EventMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000018 /* EventMapper.swift */; };
+		A100000001000019 /* EventRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000019 /* EventRepositoryImpl.swift */; };
+		A100000001000020 /* SettingsRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000020 /* SettingsRepositoryImpl.swift */; };
+		A100000001000021 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000021 /* AppSettings.swift */; };
+		A100000001000022 /* DesignTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000022 /* DesignTemplate.swift */; };
+		A100000001000023 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000023 /* Event.swift */; };
+		A100000001000024 /* EventSortType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000024 /* EventSortType.swift */; };
+		A100000001000025 /* PhraseTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000025 /* PhraseTemplate.swift */; };
+		A100000001000026 /* EventRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000026 /* EventRepositoryProtocol.swift */; };
+		A100000001000027 /* SettingsRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000027 /* SettingsRepositoryProtocol.swift */; };
+		A100000001000028 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000028 /* CameraPreviewView.swift */; };
+		A100000001000029 /* CameraScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000029 /* CameraScreen.swift */; };
+		A100000001000030 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000030 /* CameraViewModel.swift */; };
+		A100000001000031 /* EditorScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000031 /* EditorScreen.swift */; };
+		A100000001000032 /* EditorToolPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000032 /* EditorToolPanel.swift */; };
+		A100000001000033 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000033 /* EditorViewModel.swift */; };
+		A100000001000034 /* ImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000034 /* ImageRenderer.swift */; };
+		A100000001000035 /* SaveSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000035 /* SaveSuccessView.swift */; };
+		A100000001000036 /* ShareSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000036 /* ShareSheetView.swift */; };
+		A100000001000037 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000037 /* TextOverlayView.swift */; };
+		A100000001000038 /* CustomPhraseEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000038 /* CustomPhraseEditor.swift */; };
+		A100000001000039 /* DesignTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000039 /* DesignTemplatePicker.swift */; };
+		A100000001000040 /* EventCreateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000040 /* EventCreateScreen.swift */; };
+		A100000001000041 /* EventCreateViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000041 /* EventCreateViewModel.swift */; };
+		A100000001000042 /* EventPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000042 /* EventPreviewSection.swift */; };
+		A100000001000043 /* PhraseTemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000043 /* PhraseTemplatePicker.swift */; };
+		A100000001000044 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000044 /* EmptyStateView.swift */; };
+		A100000001000045 /* EventActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000045 /* EventActionSheet.swift */; };
+		A100000001000046 /* EventCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000046 /* EventCardView.swift */; };
+		A100000001000047 /* EventListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000047 /* EventListScreen.swift */; };
+		A100000001000048 /* EventListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000048 /* EventListViewModel.swift */; };
+		A100000001000049 /* PhotoPickerScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000049 /* PhotoPickerScreen.swift */; };
+		A100000001000050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000050 /* Assets.xcassets */; };
+		A100000001000052 /* SavedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000052 /* SavedImage.swift */; };
+		A100000001000053 /* SavedImageRepositoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000053 /* SavedImageRepositoryProtocol.swift */; };
+		A100000001000054 /* SavedImageLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000054 /* SavedImageLocalDataSource.swift */; };
+		A100000001000055 /* SavedImageMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000055 /* SavedImageMapper.swift */; };
+		A100000001000056 /* SavedImageRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000056 /* SavedImageRepositoryImpl.swift */; };
+		A100000001000057 /* ImageFileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000057 /* ImageFileStorage.swift */; };
+		A100000001000058 /* LibraryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000058 /* LibraryScreen.swift */; };
+		A100000001000059 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000059 /* LibraryViewModel.swift */; };
+		A100000001000060 /* LibraryGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000060 /* LibraryGridView.swift */; };
+		A100000001000061 /* LibraryCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000061 /* LibraryCalendarView.swift */; };
+		A100000001000062 /* ImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000062 /* ImageDetailView.swift */; };
+		A100000001000063 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000063 /* MainTabView.swift */; };
+		A100000001000064 /* EventSelectSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000064 /* EventSelectSheet.swift */; };
+		A100000001000065 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000065 /* SettingsScreen.swift */; };
+		A100000001000066 /* AppLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = B100000001000066 /* AppLocalization.swift */; };
+		A100000001000070 /* KleeOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000070 /* KleeOne-Regular.ttf */; };
+		A100000001000071 /* KleeOne-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000071 /* KleeOne-SemiBold.ttf */; };
+		A100000001000072 /* GreatVibes-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000072 /* GreatVibes-Regular.ttf */; };
+		A100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt */; };
+		A100000001000074 /* ja.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000074 /* ja.lproj */; };
+		A100000001000075 /* en-US.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000075 /* en-US.lproj */; };
+		A100000001000076 /* en-GB.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000076 /* en-GB.lproj */; };
+		A100000001000077 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000077 /* de.lproj */; };
+		A100000001000078 /* es-MX.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000078 /* es-MX.lproj */; };
+		A100000001000079 /* pt-BR.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000079 /* pt-BR.lproj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -137,6 +149,18 @@
 		B100000001000062 /* ImageDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDetailView.swift; sourceTree = "<group>"; };
 		B100000001000063 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		B100000001000064 /* EventSelectSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSelectSheet.swift; sourceTree = "<group>"; };
+		B100000001000065 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
+		B100000001000066 /* AppLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLocalization.swift; sourceTree = "<group>"; };
+		B100000001000070 /* KleeOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/KleeOne-Regular.ttf; sourceTree = "<group>"; };
+		B100000001000071 /* KleeOne-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/KleeOne-SemiBold.ttf; sourceTree = "<group>"; };
+		B100000001000072 /* GreatVibes-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/GreatVibes-Regular.ttf; sourceTree = "<group>"; };
+		B100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fonts/THIRD_PARTY_FONT_LICENSES.txt; sourceTree = "<group>"; };
+		B100000001000074 /* ja.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ja.lproj; sourceTree = "<group>"; };
+		B100000001000075 /* en-US.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "en-US.lproj"; sourceTree = "<group>"; };
+		B100000001000076 /* en-GB.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "en-GB.lproj"; sourceTree = "<group>"; };
+		B100000001000077 /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
+		B100000001000078 /* es-MX.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "es-MX.lproj"; sourceTree = "<group>"; };
+		B100000001000079 /* pt-BR.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "pt-BR.lproj"; sourceTree = "<group>"; };
 		B100000001000099 /* HiBiPic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiBiPic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -151,20 +175,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D100000001000000 /* Root */ = {
+		D100000001000000 = {
 			isa = PBXGroup;
 			children = (
 				D100000001000001 /* HiBiPic */,
 				D100000001000098 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		D100000001000098 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				B100000001000099 /* HiBiPic.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D100000001000001 /* HiBiPic */ = {
@@ -196,6 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				D100000001000021 /* Components */,
+				D100000001000024 /* Localization */,
 				D100000001000022 /* Theme */,
 				D100000001000023 /* Utils */,
 			);
@@ -231,6 +248,14 @@
 				B100000001000013 /* DateCalculator.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		D100000001000024 /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000066 /* AppLocalization.swift */,
+			);
+			path = Localization;
 			sourceTree = "<group>";
 		};
 		D100000001000040 /* Data */ = {
@@ -332,6 +357,7 @@
 				D100000001000063 /* EventCreate */,
 				D100000001000064 /* EventList */,
 				D100000001000066 /* Library */,
+				D100000001000068 /* Settings */,
 				D100000001000065 /* PhotoPicker */,
 			);
 			path = Features;
@@ -414,12 +440,38 @@
 			path = Capture;
 			sourceTree = "<group>";
 		};
+		D100000001000068 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000065 /* SettingsScreen.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		D100000001000070 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				B100000001000050 /* Assets.xcassets */,
+				B100000001000070 /* KleeOne-Regular.ttf */,
+				B100000001000071 /* KleeOne-SemiBold.ttf */,
+				B100000001000072 /* GreatVibes-Regular.ttf */,
+				B100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt */,
+				B100000001000074 /* ja.lproj */,
+				B100000001000075 /* en-US.lproj */,
+				B100000001000076 /* en-GB.lproj */,
+				B100000001000077 /* de.lproj */,
+				B100000001000078 /* es-MX.lproj */,
+				B100000001000079 /* pt-BR.lproj */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		D100000001000098 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B100000001000099 /* HiBiPic.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -466,7 +518,7 @@
 				en,
 				Base,
 			);
-			mainGroup = D100000001000000 /* Root */;
+			mainGroup = D100000001000000;
 			productRefGroup = D100000001000098 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -482,6 +534,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				A100000001000050 /* Assets.xcassets in Resources */,
+				A100000001000070 /* KleeOne-Regular.ttf in Resources */,
+				A100000001000071 /* KleeOne-SemiBold.ttf in Resources */,
+				A100000001000072 /* GreatVibes-Regular.ttf in Resources */,
+				A100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt in Resources */,
+				A100000001000074 /* ja.lproj in Resources */,
+				A100000001000075 /* en-US.lproj in Resources */,
+				A100000001000076 /* en-GB.lproj in Resources */,
+				A100000001000077 /* de.lproj in Resources */,
+				A100000001000078 /* es-MX.lproj in Resources */,
+				A100000001000079 /* pt-BR.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,6 +616,8 @@
 				A100000001000062 /* ImageDetailView.swift in Sources */,
 				A100000001000063 /* MainTabView.swift in Sources */,
 				A100000001000064 /* EventSelectSheet.swift in Sources */,
+				A100000001000065 /* SettingsScreen.swift in Sources */,
+				A100000001000066 /* AppLocalization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -686,7 +750,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = VL953U2L47;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = HiBiPic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HiBiPic;
@@ -718,7 +782,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = VL953U2L47;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = HiBiPic/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HiBiPic;
@@ -765,7 +829,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = E100000001000000 /* Project object */;
 }

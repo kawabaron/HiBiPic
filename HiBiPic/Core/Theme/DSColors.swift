@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - HiBiPic Color Palette
 /// "Warm Minimal" theme - refined, quiet, generous whitespace, photos are the hero.
@@ -6,47 +7,47 @@ enum DSColors {
 
     // MARK: - Backgrounds
     /// Primary background - warm off-white
-    static let background = Color(hex: "FAF9F7")
+    static let background = dynamicColor(light: "FAF9F7", dark: "111311")
     /// Card / elevated surface background - pure white
-    static let cardBackground = Color(hex: "FFFFFF")
+    static let cardBackground = dynamicColor(light: "FFFFFF", dark: "1B1C1A")
     /// Secondary background - slightly darker warm gray
-    static let secondaryBackground = Color(hex: "F5F3F0")
+    static let secondaryBackground = dynamicColor(light: "F5F3F0", dark: "242521")
 
     // MARK: - Text
     /// Primary text - dark charcoal for maximum readability
-    static let textPrimary = Color(hex: "2C2C2E")
+    static let textPrimary = dynamicColor(light: "2C2C2E", dark: "F5F1EA")
     /// Secondary text - medium gray for supporting copy
-    static let textSecondary = Color(hex: "8E8E93")
+    static let textSecondary = dynamicColor(light: "8E8E93", dark: "B4AFA8")
     /// Tertiary text - light gray for placeholders / captions
-    static let textTertiary = Color(hex: "AEAEB2")
+    static let textTertiary = dynamicColor(light: "AEAEB2", dark: "7E7B74")
 
     // MARK: - Accent
     /// Primary accent - sage green
-    static let accent = Color(hex: "7C9A8E")
+    static let accent = dynamicColor(light: "7C9A8E", dark: "97B7AA")
     /// Light accent variant - for tinted backgrounds
-    static let accentLight = Color(hex: "B8CFC4")
+    static let accentLight = dynamicColor(light: "B8CFC4", dark: "42544B")
     /// Dark accent variant - for pressed states
-    static let accentDark = Color(hex: "5B7A6E")
+    static let accentDark = dynamicColor(light: "5B7A6E", dark: "CCE0D7")
 
     // MARK: - Semantic
     /// Error / destructive - muted red
-    static let error = Color(hex: "C44E4E")
+    static let error = dynamicColor(light: "C44E4E", dark: "E08282")
     /// Success - muted green
-    static let success = Color(hex: "6B9B7D")
+    static let success = dynamicColor(light: "6B9B7D", dark: "8AC19B")
     /// Warning - warm amber
-    static let warning = Color(hex: "D4A054")
+    static let warning = dynamicColor(light: "D4A054", dark: "E2B56B")
 
     // MARK: - Borders & Dividers
     /// Subtle border for cards and inputs
-    static let border = Color(hex: "E8E6E3")
+    static let border = dynamicColor(light: "E8E6E3", dark: "31332E")
     /// Barely visible divider for lists
-    static let divider = Color(hex: "F0EEEB")
+    static let divider = dynamicColor(light: "F0EEEB", dark: "262823")
 
     // MARK: - Overlays
     /// Light overlay - for bottom-sheet scrims
-    static let overlayLight = Color.white.opacity(0.85)
+    static let overlayLight = dynamicColor(light: "FFFFFFD9", dark: "1B1C1AD9")
     /// Dark overlay - for modal backdrops / photo overlays
-    static let overlayDark = Color.black.opacity(0.4)
+    static let overlayDark = dynamicColor(light: "00000066", dark: "00000099")
 
     // MARK: - Buttons
     static let buttonPrimaryBg = accent
@@ -55,8 +56,23 @@ enum DSColors {
     static let buttonSecondaryText = accent
     static let buttonDestructiveBg = error
     static let buttonDestructiveText = Color.white
-    static let buttonDisabledBg = Color(hex: "E8E6E3")
-    static let buttonDisabledText = Color(hex: "AEAEB2")
+    static let buttonDisabledBg = dynamicColor(light: "E8E6E3", dark: "31332E")
+    static let buttonDisabledText = dynamicColor(light: "AEAEB2", dark: "7E7B74")
+
+    private static func dynamicColor(light: String, dark: String) -> Color {
+        Color(uiColor: dynamicUIColor(light: light, dark: dark))
+    }
+
+    private static func dynamicUIColor(light: String, dark: String) -> UIColor {
+        UIColor { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark:
+                return UIColor(hex: dark)
+            default:
+                return UIColor(hex: light)
+            }
+        }
+    }
 }
 
 // MARK: - Color + Hex Initialiser
@@ -64,43 +80,6 @@ extension Color {
 
     /// Create a ``Color`` from a hex string (3, 4, 6, or 8 characters, optional `#` prefix).
     init(hex: String) {
-        let sanitised = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "#", with: "")
-
-        var rgb: UInt64 = 0
-        Scanner(string: sanitised).scanHexInt64(&rgb)
-
-        let r, g, b, a: Double
-
-        switch sanitised.count {
-        case 3: // RGB (12-bit)
-            r = Double((rgb >> 8) & 0xF) / 15.0
-            g = Double((rgb >> 4) & 0xF) / 15.0
-            b = Double(rgb & 0xF) / 15.0
-            a = 1.0
-
-        case 4: // RGBA (16-bit)
-            r = Double((rgb >> 12) & 0xF) / 15.0
-            g = Double((rgb >> 8) & 0xF) / 15.0
-            b = Double((rgb >> 4) & 0xF) / 15.0
-            a = Double(rgb & 0xF) / 15.0
-
-        case 6: // RRGGBB (24-bit)
-            r = Double((rgb >> 16) & 0xFF) / 255.0
-            g = Double((rgb >> 8) & 0xFF) / 255.0
-            b = Double(rgb & 0xFF) / 255.0
-            a = 1.0
-
-        case 8: // RRGGBBAA (32-bit)
-            r = Double((rgb >> 24) & 0xFF) / 255.0
-            g = Double((rgb >> 16) & 0xFF) / 255.0
-            b = Double((rgb >> 8) & 0xFF) / 255.0
-            a = Double(rgb & 0xFF) / 255.0
-
-        default:
-            r = 0; g = 0; b = 0; a = 1.0
-        }
-
-        self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
+        self.init(uiColor: UIColor(hex: hex))
     }
 }

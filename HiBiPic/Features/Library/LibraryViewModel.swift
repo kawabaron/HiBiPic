@@ -9,10 +9,15 @@ enum LibraryViewMode: String, CaseIterable {
 
     var displayLabel: String {
         switch self {
-        case .grid:     return "グリッド"
-        case .calendar: return "カレンダー"
+        case .grid:     return L10n.t("グリッド")
+        case .calendar: return L10n.t("カレンダー")
         }
     }
+}
+
+enum SavedImageEditorPreparationResult {
+    case ready(EditorViewModel)
+    case failed(String)
 }
 
 // MARK: - LibraryViewModel
@@ -23,7 +28,7 @@ final class LibraryViewModel {
     // MARK: - State
 
     var images: [SavedImage] = []
-    var viewMode: LibraryViewMode = .grid
+    var viewMode: LibraryViewMode = .calendar
     var selectedMonth: Date = Date()
     var errorMessage: String?
 
@@ -60,7 +65,7 @@ final class LibraryViewModel {
             }
             errorMessage = nil
         } catch {
-            errorMessage = "画像の読み込みに失敗しました"
+            errorMessage = L10n.t("画像の読み込みに失敗しました")
         }
     }
 
@@ -70,10 +75,47 @@ final class LibraryViewModel {
         do {
             try savedImageRepo.delete(id: image.id)
             ImageFileStorage.shared.deleteImage(fileName: image.fileName)
+            if let originalFileName = image.originalFileName {
+                ImageFileStorage.shared.deleteOriginalImage(fileName: originalFileName)
+            }
             images.removeAll { $0.id == image.id }
         } catch {
-            errorMessage = "画像の削除に失敗しました"
+            errorMessage = L10n.t("画像の削除に失敗しました")
         }
+    }
+
+    func prepareEditor(for image: SavedImage) -> SavedImageEditorPreparationResult {
+        if let recipe = image.editRecipe,
+           let originalFileName = image.originalFileName,
+           let originalImage = ImageFileStorage.shared.loadOriginalImage(fileName: originalFileName) {
+            let snapshotEvent = recipe.makeSnapshotEvent(eventId: image.eventId)
+            return .ready(
+                EditorViewModel(
+                    image: originalImage,
+                    event: snapshotEvent,
+                    restoredRecipe: recipe
+                )
+            )
+        }
+
+        guard let renderedImage = ImageFileStorage.shared.loadImage(fileName: image.fileName) else {
+            return .failed(L10n.t("画像ファイルの読み込みに失敗しました"))
+        }
+
+        if let event = resolveEvent(for: image) {
+            return .ready(EditorViewModel(image: renderedImage, event: event))
+        }
+
+        if let recipe = image.editRecipe {
+            return .ready(
+                EditorViewModel(
+                    image: renderedImage,
+                    event: recipe.makeSnapshotEvent(eventId: image.eventId)
+                )
+            )
+        }
+
+        return .failed(L10n.t("関連するイベント情報の読み込みに失敗しました"))
     }
 
     // MARK: - Calendar Helpers
@@ -102,7 +144,7 @@ final class LibraryViewModel {
     /// Returns images created on a specific date (YYYY-MM-DD).
     func imagesForDate(_ dateString: String) -> [SavedImage] {
         images.filter { image in
-            image.createdAt.hasPrefix(dateString)
+            localCreatedDateString(for: image) == dateString
         }
     }
 
@@ -111,7 +153,9 @@ final class LibraryViewModel {
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents([.year, .month], from: month)
         let prefix = String(format: "%04d-%02d", components.year ?? 0, components.month ?? 0)
-        return images.filter { $0.createdAt.hasPrefix(prefix) }
+        return images.filter { image in
+            localCreatedDateString(for: image)?.hasPrefix(prefix) == true
+        }
     }
 
     // MARK: - Month Navigation
@@ -130,8 +174,29 @@ final class LibraryViewModel {
 
     var monthTitle: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy年M月"
+        formatter.locale = AppLocalizer.currentLanguage.locale
+        formatter.setLocalizedDateFormatFromTemplate("yMMMM")
         return formatter.string(from: selectedMonth)
+    }
+
+    private func resolveEvent(for image: SavedImage) -> Event? {
+        if filteredEvent?.id == image.eventId {
+            return filteredEvent
+        }
+
+        do {
+            return try eventRepo.fetchById(image.eventId)
+        } catch {
+            return nil
+        }
+    }
+
+    private func localCreatedDateString(for image: SavedImage) -> String? {
+        if let dateString = DateCalculator.localDateString(fromISO8601: image.createdAt) {
+            return dateString
+        }
+
+        let prefix = String(image.createdAt.prefix(10))
+        return DateCalculator.baseDateFromString(prefix) == nil ? nil : prefix
     }
 }

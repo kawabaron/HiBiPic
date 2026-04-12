@@ -10,6 +10,7 @@ struct EventPreviewSection: View {
 
     let previewText: (singleLine: String, line1: String, line2: String)
     let designTemplateType: DesignTemplateType
+    let fontPreset: FontPreset = .standard
     let layoutMode: LayoutMode
 
     // MARK: - Private
@@ -22,7 +23,7 @@ struct EventPreviewSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DSSpacing.md) {
-            Text("仕上がりイメージ")
+            Text(L10n.t("仕上がりイメージ"))
                 .font(DSTypography.headline)
                 .foregroundStyle(DSColors.textPrimary)
 
@@ -95,11 +96,13 @@ struct EventPreviewSection: View {
             VStack(spacing: DSSpacing.xs) {
                 Text(displayLine1)
                     .font(line1Font)
+                    .tracking(line1Tracking)
                     .foregroundStyle(textColor)
                     .multilineTextAlignment(textAlign)
 
                 Text(displayLine2)
                     .font(line2Font)
+                    .tracking(line2Tracking)
                     .foregroundStyle(textColor)
                     .multilineTextAlignment(textAlign)
             }
@@ -108,6 +111,7 @@ struct EventPreviewSection: View {
             // Single line layout
             Text(displaySingleLine)
                 .font(singleLineFont)
+                .tracking(singleLineTracking)
                 .foregroundStyle(textColor)
                 .multilineTextAlignment(textAlign)
                 .frame(maxWidth: .infinity, alignment: frameAlignment)
@@ -118,37 +122,93 @@ struct EventPreviewSection: View {
 
     private var displaySingleLine: String {
         let text = previewText.singleLine
-        return text.isEmpty ? "プレビュー" : text
+        return text.isEmpty ? L10n.t("プレビュー") : text
     }
 
     private var displayLine1: String {
         let text = previewText.line1
-        return text.isEmpty ? "ライン1" : text
+        return text.isEmpty ? L10n.t("ライン1") : text
     }
 
     private var displayLine2: String {
         let text = previewText.line2
-        return text.isEmpty ? "ライン2" : text
+        return text.isEmpty ? L10n.t("ライン2") : text
     }
 
     // MARK: - Font Helpers
 
+    private var singleLineBaseSize: CGFloat {
+        16 * design.fontSizeScale
+    }
+
+    private var line1BaseSize: CGFloat {
+        let baseSize: CGFloat = design.numberEmphasis ? 13 : 15
+        return baseSize * design.fontSizeScale
+    }
+
+    private var line2BaseSize: CGFloat {
+        let baseSize: CGFloat = design.numberEmphasis ? 22 : 15
+        return baseSize * design.fontSizeScale
+    }
+
     private var singleLineFont: Font {
-        let baseSize: CGFloat = 16 * design.fontSizeScale
-        return Font.system(size: baseSize, weight: swiftUIWeight, design: .rounded)
+        overlayFont(size: singleLineBaseSize, weight: swiftUIWeight, text: displaySingleLine)
     }
 
     private var line1Font: Font {
-        let baseSize: CGFloat = design.numberEmphasis ? 13 : 15
-        let scaled = baseSize * design.fontSizeScale
-        return Font.system(size: scaled, weight: swiftUIWeight, design: .rounded)
+        overlayFont(size: line1BaseSize, weight: swiftUIWeight, text: displayLine1)
     }
 
     private var line2Font: Font {
-        let baseSize: CGFloat = design.numberEmphasis ? 22 : 15
-        let scaled = baseSize * design.fontSizeScale
         let weight: Font.Weight = design.numberEmphasis ? .bold : swiftUIWeight
-        return Font.system(size: scaled, weight: weight, design: .rounded)
+        return overlayFont(
+            size: line2BaseSize,
+            weight: weight,
+            text: displayLine2,
+            isEmphasized: design.numberEmphasis
+        )
+    }
+
+    private var singleLineTracking: CGFloat {
+        overlayTracking(size: singleLineBaseSize, text: displaySingleLine)
+    }
+
+    private var line1Tracking: CGFloat {
+        overlayTracking(size: line1BaseSize, text: displayLine1)
+    }
+
+    private var line2Tracking: CGFloat {
+        overlayTracking(size: line2BaseSize, text: displayLine2, isEmphasized: design.numberEmphasis)
+    }
+
+    private func overlayFont(
+        size: CGFloat,
+        weight: Font.Weight,
+        text: String,
+        isEmphasized: Bool = false
+    ) -> Font {
+        OverlayFontResolver.swiftUIFont(
+            preset: fontPreset,
+            size: size,
+            weight: weight,
+            designTemplate: design,
+            text: text,
+            isEmphasized: isEmphasized
+        )
+    }
+
+    private func overlayTracking(
+        size: CGFloat,
+        text: String,
+        isEmphasized: Bool = false
+    ) -> CGFloat {
+        OverlayFontResolver.tracking(
+            preset: fontPreset,
+            size: size,
+            designTemplate: design,
+            text: text,
+            isEmphasized: isEmphasized
+        )
     }
 
     private var swiftUIWeight: Font.Weight {
@@ -205,13 +265,13 @@ struct EventPreviewSection: View {
 
             EventPreviewSection(
                 previewText: (singleLine: "入社から 100日経過", line1: "", line2: ""),
-                designTemplateType: .film,
+                designTemplateType: .classic,
                 layoutMode: .single
             )
 
             EventPreviewSection(
                 previewText: (singleLine: "", line1: "禁煙", line2: "30日目"),
-                designTemplateType: .poster,
+                designTemplateType: .milestone,
                 layoutMode: .double
             )
         }

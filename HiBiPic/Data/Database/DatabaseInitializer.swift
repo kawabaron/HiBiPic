@@ -9,7 +9,7 @@ final class DatabaseInitializer {
 
     /// Current schema version. Bump this and add a corresponding migration
     /// closure to `migrations` whenever the schema changes.
-    private static let currentVersion: Int32 = 2
+    private static let currentVersion: Int32 = 5
 
     // MARK: - Public Entry Point
 
@@ -32,11 +32,14 @@ final class DatabaseInitializer {
                 count_type          TEXT NOT NULL,
                 phrase_template_id  TEXT NOT NULL,
                 design_template_id  TEXT NOT NULL,
+                font_preset         TEXT NOT NULL DEFAULT 'standard',
                 layout_mode         TEXT NOT NULL,
                 custom_phrase_mode  INTEGER NOT NULL DEFAULT 0,
                 custom_single_line  TEXT,
                 custom_line1        TEXT,
                 custom_line2        TEXT,
+                custom_line3        TEXT,
+                editor_preferences_json TEXT,
                 is_pinned           INTEGER NOT NULL DEFAULT 0,
                 sort_order          INTEGER,
                 last_used_at        TEXT,
@@ -59,6 +62,8 @@ final class DatabaseInitializer {
                 id          TEXT PRIMARY KEY,
                 event_id    TEXT NOT NULL,
                 file_name   TEXT NOT NULL,
+                original_file_name TEXT,
+                edit_recipe_json   TEXT,
                 created_at  TEXT NOT NULL,
                 FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
             );
@@ -123,6 +128,28 @@ final class DatabaseInitializer {
             executeRaw(db: db, sql: "CREATE INDEX IF NOT EXISTS idx_saved_images_event_id   ON saved_images (event_id);")
             executeRaw(db: db, sql: "CREATE INDEX IF NOT EXISTS idx_saved_images_created_at ON saved_images (created_at);")
         },
+        3: { db in
+            guard !columnExists(db: db, table: "events", column: "font_preset") else { return }
+            executeRaw(db: db, sql: "ALTER TABLE events ADD COLUMN font_preset TEXT NOT NULL DEFAULT 'standard';")
+        },
+        4: { db in
+            if !columnExists(db: db, table: "saved_images", column: "original_file_name") {
+                executeRaw(db: db, sql: "ALTER TABLE saved_images ADD COLUMN original_file_name TEXT;")
+            }
+
+            if !columnExists(db: db, table: "saved_images", column: "edit_recipe_json") {
+                executeRaw(db: db, sql: "ALTER TABLE saved_images ADD COLUMN edit_recipe_json TEXT;")
+            }
+        },
+        5: { db in
+            if !columnExists(db: db, table: "events", column: "custom_line3") {
+                executeRaw(db: db, sql: "ALTER TABLE events ADD COLUMN custom_line3 TEXT;")
+            }
+
+            if !columnExists(db: db, table: "events", column: "editor_preferences_json") {
+                executeRaw(db: db, sql: "ALTER TABLE events ADD COLUMN editor_preferences_json TEXT;")
+            }
+        },
     ]
 
     // MARK: - Pragma Helpers
@@ -143,6 +170,23 @@ final class DatabaseInitializer {
 
     private static func setUserVersion(db: OpaquePointer, version: Int32) {
         executeRaw(db: db, sql: "PRAGMA user_version = \(version);")
+    }
+
+    private static func columnExists(db: OpaquePointer, table: String, column: String) -> Bool {
+        var stmt: OpaquePointer?
+        defer { sqlite3_finalize(stmt) }
+
+        guard sqlite3_prepare_v2(db, "PRAGMA table_info(\(table));", -1, &stmt, nil) == SQLITE_OK else {
+            return false
+        }
+
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            if let name = sqlite3_column_text(stmt, 1), String(cString: name) == column {
+                return true
+            }
+        }
+
+        return false
     }
 
     // MARK: - Raw Execution Helper

@@ -46,7 +46,7 @@ struct DSSegmentedControl: View {
                 selection = index
             }
         } label: {
-            Text(items[index])
+            Text(L10n.t(items[index]))
                 .font(DSTypography.subheadline)
                 .fontWeight(isSelected ? .semibold : .regular)
                 .foregroundStyle(isSelected ? DSColors.buttonPrimaryText : DSColors.textSecondary)
@@ -117,7 +117,7 @@ struct DSSegmentedPicker<Item: Hashable>: View {
                 selection = item
             }
         } label: {
-            Text(label(item))
+            Text(L10n.t(label(item)))
                 .font(DSTypography.subheadline)
                 .fontWeight(isSelected ? .semibold : .regular)
                 .foregroundStyle(isSelected ? DSColors.buttonPrimaryText : DSColors.textSecondary)

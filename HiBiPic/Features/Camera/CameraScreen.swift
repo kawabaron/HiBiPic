@@ -2,9 +2,8 @@ import SwiftUI
 
 // MARK: - CameraScreen
 
-/// Full-screen camera view with a live preview, overlay text showing the event's
-/// day count (styled per the selected design template), and bottom controls for
-/// shutter, photo-library, and camera-flip.
+/// Full-screen camera view with a live preview and minimal chrome.
+/// Captured photos continue into the editor for text styling there.
 struct CameraScreen: View {
 
     // MARK: - Properties
@@ -17,24 +16,6 @@ struct CameraScreen: View {
     @State private var viewModel = CameraViewModel()
     @State private var shutterPressed = false
 
-    // MARK: - Computed
-
-    private var dayCount: Int {
-        DateCalculator.calculateDays(baseDate: event.baseDate, countType: event.countType)
-    }
-
-    private var designTemplate: DesignTemplate {
-        DesignTemplateStore.template(for: event.designTemplateId)
-    }
-
-    private var overlayText: String {
-        resolvedOverlayText()
-    }
-
-    private var overlaySecondLine: String? {
-        resolvedOverlaySecondLine()
-    }
-
     // MARK: - Body
 
     var body: some View {
@@ -42,12 +23,13 @@ struct CameraScreen: View {
             // Camera preview -- full screen
             cameraPreview
 
-            // Overlay controls
-            VStack(spacing: 0) {
-                topOverlay
-                Spacer()
-                bottomBar
-            }
+            closeButton
+                .padding(.top, safeAreaTop + DSSpacing.sm)
+                .padding(.leading, DSSpacing.lg)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+
+            bottomBar
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
         .ignoresSafeArea()
         .statusBarHidden()
@@ -78,35 +60,6 @@ struct CameraScreen: View {
         }
     }
 
-    // MARK: - Top Overlay
-
-    private var topOverlay: some View {
-        ZStack(alignment: .topLeading) {
-            // Gradient scrim for readability
-            LinearGradient(
-                colors: [.black.opacity(0.5), .clear],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 140)
-
-            VStack(spacing: 0) {
-                // Close button + event info row
-                HStack(alignment: .top) {
-                    closeButton
-                    Spacer()
-                }
-                .padding(.top, safeAreaTop + DSSpacing.sm)
-                .padding(.horizontal, DSSpacing.lg)
-
-                // Overlay text preview
-                overlayTextPreview
-                    .padding(.top, DSSpacing.sm)
-                    .padding(.horizontal, DSSpacing.xl)
-            }
-        }
-    }
-
     // MARK: - Close Button
 
     private var closeButton: some View {
@@ -116,55 +69,6 @@ struct CameraScreen: View {
                 .foregroundStyle(.white)
                 .frame(width: 36, height: 36)
                 .background(.ultraThinMaterial, in: Circle())
-        }
-    }
-
-    // MARK: - Overlay Text Preview
-
-    /// Shows a preview of the stamp text styled according to the selected
-    /// design template. This is NOT burned into the camera feed -- it is
-    /// purely a positioning preview.
-    @ViewBuilder
-    private var overlayTextPreview: some View {
-        let textColor = Color(hex: designTemplate.textColor)
-        let alignment = swiftUIAlignment(from: designTemplate.alignment)
-        let font = overlayFont()
-
-        VStack(spacing: DSSpacing.xxs) {
-            if let secondLine = overlaySecondLine {
-                // Double-line layout
-                Text(overlayText)
-                    .font(font)
-                    .foregroundStyle(textColor.opacity(0.85))
-                    .multilineTextAlignment(textAlignment(from: designTemplate.alignment))
-
-                if designTemplate.numberEmphasis {
-                    Text(secondLine)
-                        .font(overlayFontEmphasised())
-                        .foregroundStyle(textColor.opacity(0.85))
-                        .multilineTextAlignment(textAlignment(from: designTemplate.alignment))
-                } else {
-                    Text(secondLine)
-                        .font(font)
-                        .foregroundStyle(textColor.opacity(0.85))
-                        .multilineTextAlignment(textAlignment(from: designTemplate.alignment))
-                }
-            } else {
-                // Single-line layout
-                Text(overlayText)
-                    .font(font)
-                    .foregroundStyle(textColor.opacity(0.85))
-                    .multilineTextAlignment(textAlignment(from: designTemplate.alignment))
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: alignment)
-        .padding(.vertical, designTemplate.showBackground ? DSSpacing.sm : 0)
-        .padding(.horizontal, designTemplate.showBackground ? DSSpacing.md : 0)
-        .background {
-            if designTemplate.showBackground {
-                RoundedRectangle(cornerRadius: DSSpacing.cornerSm, style: .continuous)
-                    .fill(Color(hex: designTemplate.backgroundColor))
-            }
         }
     }
 
@@ -257,13 +161,13 @@ struct CameraScreen: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, DSSpacing.xxxl)
 
-                    if message.contains("許可") || message.contains("アクセス") {
+                    if viewModel.cameraAccessDenied {
                         Button {
                             if let url = URL(string: UIApplication.openSettingsURLString) {
                                 UIApplication.shared.open(url)
                             }
                         } label: {
-                            Text("設定を開く")
+                            Text(L10n.t("設定を開く"))
                                 .font(DSTypography.headline)
                                 .foregroundStyle(DSColors.accent)
                         }
@@ -277,9 +181,12 @@ struct CameraScreen: View {
     private func startCamera() async {
         let granted = await viewModel.requestCameraPermission()
         guard granted else {
-            viewModel.cameraError = "カメラへのアクセスが許可されていません。設定からカメラへのアクセスを許可してください。"
+            viewModel.cameraAccessDenied = true
+            viewModel.cameraError = L10n.t("カメラへのアクセスが許可されていません。設定からカメラへのアクセスを許可してください。")
             return
         }
+
+        viewModel.cameraAccessDenied = false
 
         // Configure the session on a background thread
         await Task.detached(priority: .userInitiated) {
@@ -297,96 +204,6 @@ struct CameraScreen: View {
                 onImageCaptured(image)
             }
             shutterPressed = false
-        }
-    }
-
-    // MARK: - Text Helpers
-
-    private func resolvedOverlayText() -> String {
-        if event.customPhraseMode {
-            if event.layoutMode == .single {
-                return event.customSingleLine ?? event.name
-            } else {
-                return event.customLine1 ?? event.name
-            }
-        }
-
-        let template = PhraseTemplateStore.allTemplates.first { $0.id == event.phraseTemplateId }
-            ?? PhraseTemplateStore.defaultTemplate(for: event.countType)
-
-        let store = PhraseTemplateStore()
-        let generated = store.generateText(
-            template: template,
-            label: event.name,
-            count: dayCount,
-            layoutMode: event.layoutMode
-        )
-
-        if event.layoutMode == .single {
-            return generated.singleLine
-        } else {
-            return generated.line1
-        }
-    }
-
-    private func resolvedOverlaySecondLine() -> String? {
-        guard event.layoutMode == .double else { return nil }
-
-        if event.customPhraseMode {
-            return event.customLine2
-        }
-
-        let template = PhraseTemplateStore.allTemplates.first { $0.id == event.phraseTemplateId }
-            ?? PhraseTemplateStore.defaultTemplate(for: event.countType)
-
-        let store = PhraseTemplateStore()
-        let generated = store.generateText(
-            template: template,
-            label: event.name,
-            count: dayCount,
-            layoutMode: event.layoutMode
-        )
-
-        return generated.line2.isEmpty ? nil : generated.line2
-    }
-
-    private func overlayFont() -> Font {
-        let scale = designTemplate.fontSizeScale
-        let baseSize: CGFloat = 16 * scale
-        return Font.system(size: baseSize, weight: uiFontWeight(designTemplate.fontWeight), design: .rounded)
-    }
-
-    private func overlayFontEmphasised() -> Font {
-        let scale = designTemplate.fontSizeScale
-        let baseSize: CGFloat = 24 * scale
-        return Font.system(size: baseSize, weight: .bold, design: .rounded)
-    }
-
-    private func uiFontWeight(_ weight: DesignTemplate.FontWeight) -> Font.Weight {
-        switch weight {
-        case .thin:     return .thin
-        case .light:    return .light
-        case .regular:  return .regular
-        case .medium:   return .medium
-        case .semibold: return .semibold
-        case .bold:     return .bold
-        case .heavy:    return .heavy
-        }
-    }
-
-    private func swiftUIAlignment(from alignment: TextAlignment) -> Alignment {
-        switch alignment {
-        case .left:   return .leading
-        case .center: return .center
-        case .right:  return .trailing
-        }
-    }
-
-    private func textAlignment(from alignment: TextAlignment) -> SwiftUI.TextAlignment {
-        switch alignment {
-        case .left:   return .leading
-        case .center: return .center
-        case .right:  return .trailing
         }
     }
 

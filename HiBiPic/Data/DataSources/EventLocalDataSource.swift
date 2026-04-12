@@ -11,11 +11,14 @@ struct EventRow {
     let countType: String
     let phraseTemplateId: String
     let designTemplateId: String
+    let fontPreset: String
     let layoutMode: String
     let customPhraseMode: Int
     let customSingleLine: String?
     let customLine1: String?
     let customLine2: String?
+    let customLine3: String?
+    let editorPreferencesJSON: String?
     let isPinned: Int
     let sortOrder: Int?
     let lastUsedAt: String?
@@ -104,8 +107,9 @@ final class EventLocalDataSource {
         // Whitelist to prevent SQL injection via field name.
         let allowedFields: Set<String> = [
             "name", "base_date", "count_type", "phrase_template_id",
-            "design_template_id", "layout_mode", "custom_phrase_mode",
-            "custom_single_line", "custom_line1", "custom_line2",
+            "design_template_id", "font_preset", "layout_mode", "custom_phrase_mode",
+            "custom_single_line", "custom_line1", "custom_line2", "custom_line3",
+            "editor_preferences_json",
             "is_pinned", "sort_order", "last_used_at",
             "updated_at", "is_archived",
         ]
@@ -134,11 +138,14 @@ private extension EventRow {
             "count_type": countType,
             "phrase_template_id": phraseTemplateId,
             "design_template_id": designTemplateId,
+            "font_preset": fontPreset,
             "layout_mode": layoutMode,
             "custom_phrase_mode": customPhraseMode,
             "custom_single_line": customSingleLine,
             "custom_line1": customLine1,
             "custom_line2": customLine2,
+            "custom_line3": customLine3,
+            "editor_preferences_json": editorPreferencesJSON,
             "is_pinned": isPinned,
             "sort_order": sortOrder,
             "last_used_at": lastUsedAt,
@@ -157,6 +164,7 @@ private extension EventRow {
             let countType = dict["count_type"] as? String,
             let phraseTemplateId = dict["phrase_template_id"] as? String,
             let designTemplateId = dict["design_template_id"] as? String,
+            let fontPreset = dict["font_preset"] as? String,
             let layoutMode = dict["layout_mode"] as? String,
             let customPhraseMode = dict["custom_phrase_mode"] as? Int,
             let isPinned = dict["is_pinned"] as? Int,
@@ -173,11 +181,14 @@ private extension EventRow {
         self.countType = countType
         self.phraseTemplateId = phraseTemplateId
         self.designTemplateId = designTemplateId
+        self.fontPreset = fontPreset
         self.layoutMode = layoutMode
         self.customPhraseMode = customPhraseMode
         self.customSingleLine = dict["custom_single_line"] as? String
         self.customLine1 = dict["custom_line1"] as? String
         self.customLine2 = dict["custom_line2"] as? String
+        self.customLine3 = dict["custom_line3"] as? String
+        self.editorPreferencesJSON = dict["editor_preferences_json"] as? String
         self.isPinned = isPinned
         self.sortOrder = dict["sort_order"] as? Int
         self.lastUsedAt = dict["last_used_at"] as? String

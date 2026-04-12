@@ -21,7 +21,7 @@ struct DesignTemplatePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: DSSpacing.md) {
-            Text("写真の雰囲気")
+            Text(L10n.t("写真の雰囲気"))
                 .font(DSTypography.headline)
                 .foregroundStyle(DSColors.textPrimary)
 
@@ -118,19 +118,22 @@ struct DesignTemplatePicker: View {
 
         if template.numberEmphasis && template.defaultLayoutMode == .double {
             VStack(spacing: 1) {
-                Text("イベント")
-                    .font(.system(size: 8, weight: fontWeight(template.fontWeight)))
+                Text(L10n.t("fallback.preview.name"))
+                    .font(templatePreviewFont(template: template, size: 8, text: L10n.t("fallback.preview.name")))
+                    .tracking(templatePreviewTracking(template: template, size: 8, text: L10n.t("fallback.preview.name")))
                     .foregroundStyle(textColor)
 
-                Text("30日")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                Text(L10n.t("30日"))
+                    .font(templatePreviewFont(template: template, size: 14, weight: .bold, text: L10n.t("30日"), isEmphasized: true))
+                    .tracking(templatePreviewTracking(template: template, size: 14, text: L10n.t("30日"), isEmphasized: true))
                     .foregroundStyle(textColor)
             }
             .frame(maxWidth: .infinity, alignment: align)
             .multilineTextAlignment(textAlign)
         } else {
-            Text("イベント 30日")
-                .font(.system(size: 10, weight: fontWeight(template.fontWeight)))
+            Text(L10n.t("sample.preview.single"))
+                .font(templatePreviewFont(template: template, size: 10, text: L10n.t("sample.preview.single")))
+                .tracking(templatePreviewTracking(template: template, size: 10, text: L10n.t("sample.preview.single")))
                 .foregroundStyle(textColor)
                 .frame(maxWidth: .infinity, alignment: align)
                 .multilineTextAlignment(textAlign)
@@ -161,6 +164,36 @@ struct DesignTemplatePicker: View {
                 colors: [Color(hex: "3A3A50"), Color(hex: "1E1E2E")],
                 startPoint: .topLeading, endPoint: .bottomTrailing
             )
+        case .classic:
+            return LinearGradient(
+                colors: [Color(hex: "56504A"), Color(hex: "2E2A27")],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        case .diary:
+            return LinearGradient(
+                colors: [Color(hex: "A77D62"), Color(hex: "6B4F43")],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        case .cleanLabel:
+            return LinearGradient(
+                colors: [Color(hex: "58626A"), Color(hex: "252A2F")],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        case .memory:
+            return LinearGradient(
+                colors: [Color(hex: "5B4E42"), Color(hex: "29231F")],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        case .milestone:
+            return LinearGradient(
+                colors: [Color(hex: "495A64"), Color(hex: "1D252B")],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+        case .airy:
+            return LinearGradient(
+                colors: [Color(hex: "DDE7DF"), Color(hex: "9DB7AA")],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
         }
     }
 
@@ -174,6 +207,38 @@ struct DesignTemplatePicker: View {
         case .bold:     return .bold
         case .heavy:    return .heavy
         }
+    }
+
+    private func templatePreviewFont(
+        template: DesignTemplate,
+        size: CGFloat,
+        weight: Font.Weight? = nil,
+        text: String,
+        isEmphasized: Bool = false
+    ) -> Font {
+        OverlayFontResolver.swiftUIFont(
+            preset: template.defaultFontPreset,
+            size: size,
+            weight: weight ?? fontWeight(template.fontWeight),
+            designTemplate: template,
+            text: text,
+            isEmphasized: isEmphasized
+        )
+    }
+
+    private func templatePreviewTracking(
+        template: DesignTemplate,
+        size: CGFloat,
+        text: String,
+        isEmphasized: Bool = false
+    ) -> CGFloat {
+        OverlayFontResolver.tracking(
+            preset: template.defaultFontPreset,
+            size: size,
+            designTemplate: template,
+            text: text,
+            isEmphasized: isEmphasized
+        )
     }
 }
 

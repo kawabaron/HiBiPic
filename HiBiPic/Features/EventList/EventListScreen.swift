@@ -34,16 +34,16 @@ struct EventListScreen: View {
                     .navigationTitle("HiBiPic")
                     .toolbar { toolbarItems }
                     .alert(
-                        "イベントを削除",
+                        L10n.t("イベントを削除"),
                         isPresented: $viewModel.showDeleteConfirm,
                         presenting: viewModel.eventToDelete
                     ) { event in
-                        Button("削除", role: .destructive) {
+                        Button(L10n.t("削除"), role: .destructive) {
                             viewModel.confirmDelete()
                         }
-                        Button("キャンセル", role: .cancel) {}
+                        Button(L10n.t("キャンセル"), role: .cancel) {}
                     } message: { event in
-                        Text("「\(event.name)」を削除しますか？この操作は取り消せません。")
+                        Text(L10n.f("「%@」を削除しますか？この操作は取り消せません。", event.name))
                     }
 
                 // Action-sheet overlay
@@ -53,6 +53,9 @@ struct EventListScreen: View {
             }
         }
         .onAppear {
+            viewModel.loadEvents()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .eventListDidChange)) { _ in
             viewModel.loadEvents()
         }
     }
@@ -138,7 +141,7 @@ struct EventListScreen: View {
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(DSColors.textTertiary)
 
-            Text(title)
+            Text(L10n.t(title))
                 .font(DSTypography.footnote)
                 .foregroundStyle(DSColors.textTertiary)
                 .textCase(.none)
@@ -170,13 +173,13 @@ struct EventListScreen: View {
             Button(role: .destructive) {
                 viewModel.deleteEvent(event: event)
             } label: {
-                Label("削除", systemImage: "trash")
+                Label(L10n.t("削除"), systemImage: "trash")
             }
 
             Button {
                 viewModel.archiveEvent(event: event)
             } label: {
-                Label("アーカイブ", systemImage: "archivebox")
+                Label(L10n.t("アーカイブ"), systemImage: "archivebox")
             }
             .tint(DSColors.warning)
         }
@@ -185,7 +188,7 @@ struct EventListScreen: View {
                 viewModel.togglePin(event: event)
             } label: {
                 Label(
-                    event.isPinned ? "ピン解除" : "ピン留め",
+                    event.isPinned ? L10n.t("ピン解除") : L10n.t("ピン留め"),
                     systemImage: event.isPinned ? "pin.slash" : "pin"
                 )
             }
@@ -196,7 +199,7 @@ struct EventListScreen: View {
                 viewModel.togglePin(event: event)
             } label: {
                 Label(
-                    event.isPinned ? "ピン解除" : "ピン留め",
+                    event.isPinned ? L10n.t("ピン解除") : L10n.t("ピン留め"),
                     systemImage: event.isPinned ? "pin.slash.fill" : "pin.fill"
                 )
             }
@@ -204,7 +207,7 @@ struct EventListScreen: View {
             Button {
                 viewModel.archiveEvent(event: event)
             } label: {
-                Label("アーカイブ", systemImage: "archivebox.fill")
+                Label(L10n.t("アーカイブ"), systemImage: "archivebox.fill")
             }
 
             Divider()
@@ -212,7 +215,7 @@ struct EventListScreen: View {
             Button(role: .destructive) {
                 viewModel.deleteEvent(event: event)
             } label: {
-                Label("削除", systemImage: "trash.fill")
+                Label(L10n.t("削除"), systemImage: "trash.fill")
             }
         }
     }

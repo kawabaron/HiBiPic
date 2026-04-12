@@ -14,11 +14,13 @@ final class ImageFileStorage {
 
     private let libraryDir: URL
     private let thumbnailDir: URL
+    private let originalsDir: URL
 
     private init() {
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         libraryDir = documents.appendingPathComponent("HiBiPicLibrary", isDirectory: true)
         thumbnailDir = libraryDir.appendingPathComponent("thumbnails", isDirectory: true)
+        originalsDir = libraryDir.appendingPathComponent("originals", isDirectory: true)
         ensureDirectoriesExist()
     }
 
@@ -28,14 +30,7 @@ final class ImageFileStorage {
     /// - Returns: `true` if the write succeeded.
     @discardableResult
     func saveImage(_ image: UIImage, fileName: String) -> Bool {
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return false }
-        let url = libraryDir.appendingPathComponent(fileName)
-        do {
-            try data.write(to: url, options: .atomic)
-            return true
-        } catch {
-            return false
-        }
+        saveJPEG(image, fileName: fileName, directory: libraryDir, compressionQuality: 0.9)
     }
 
     /// Generates and saves a thumbnail for the given image.
@@ -43,14 +38,12 @@ final class ImageFileStorage {
     @discardableResult
     func saveThumbnail(_ image: UIImage, fileName: String) -> Bool {
         let thumb = generateThumbnail(from: image)
-        guard let data = thumb.jpegData(compressionQuality: 0.7) else { return false }
-        let url = thumbnailDir.appendingPathComponent(fileName)
-        do {
-            try data.write(to: url, options: .atomic)
-            return true
-        } catch {
-            return false
-        }
+        return saveJPEG(thumb, fileName: fileName, directory: thumbnailDir, compressionQuality: 0.7)
+    }
+
+    @discardableResult
+    func saveOriginalImage(_ image: UIImage, fileName: String) -> Bool {
+        saveJPEG(image, fileName: fileName, directory: originalsDir, compressionQuality: 0.95)
     }
 
     // MARK: - Load
@@ -67,6 +60,12 @@ final class ImageFileStorage {
         return UIImage(data: data)
     }
 
+    func loadOriginalImage(fileName: String) -> UIImage? {
+        let url = originalsDir.appendingPathComponent(fileName)
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return UIImage(data: data)
+    }
+
     // MARK: - Delete
 
     func deleteImage(fileName: String) {
@@ -74,6 +73,11 @@ final class ImageFileStorage {
         let thumbURL = thumbnailDir.appendingPathComponent(fileName)
         try? FileManager.default.removeItem(at: fullURL)
         try? FileManager.default.removeItem(at: thumbURL)
+    }
+
+    func deleteOriginalImage(fileName: String) {
+        let originalURL = originalsDir.appendingPathComponent(fileName)
+        try? FileManager.default.removeItem(at: originalURL)
     }
 
     // MARK: - Thumbnail Generation
@@ -105,6 +109,25 @@ final class ImageFileStorage {
         }
         if !fm.fileExists(atPath: thumbnailDir.path) {
             try? fm.createDirectory(at: thumbnailDir, withIntermediateDirectories: true)
+        }
+        if !fm.fileExists(atPath: originalsDir.path) {
+            try? fm.createDirectory(at: originalsDir, withIntermediateDirectories: true)
+        }
+    }
+
+    private func saveJPEG(
+        _ image: UIImage,
+        fileName: String,
+        directory: URL,
+        compressionQuality: CGFloat
+    ) -> Bool {
+        guard let data = image.jpegData(compressionQuality: compressionQuality) else { return false }
+        let url = directory.appendingPathComponent(fileName)
+        do {
+            try data.write(to: url, options: .atomic)
+            return true
+        } catch {
+            return false
         }
     }
 }

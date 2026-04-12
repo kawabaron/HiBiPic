@@ -20,6 +20,18 @@ struct DateCalculator {
         return calendar
     }()
 
+    private static let iso8601Parser: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    private static let fractionalISO8601Parser: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
     // MARK: - Public API
 
     /// Calculate the number of days based on the count type.
@@ -74,5 +86,18 @@ struct DateCalculator {
     /// Returns today's date as a "YYYY-MM-DD" string.
     static func todayString() -> String {
         stringFromDate(Date())
+    }
+
+    /// Converts an ISO8601 timestamp into a local "YYYY-MM-DD" date string.
+    static func localDateString(fromISO8601 string: String) -> String? {
+        guard let date = dateFromISO8601String(string) else {
+            return nil
+        }
+
+        return stringFromDate(date)
+    }
+
+    private static func dateFromISO8601String(_ string: String) -> Date? {
+        iso8601Parser.date(from: string) ?? fractionalISO8601Parser.date(from: string)
     }
 }

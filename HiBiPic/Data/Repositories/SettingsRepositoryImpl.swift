@@ -14,6 +14,7 @@ final class SettingsRepositoryImpl: SettingsRepositoryProtocol {
         static let defaultCountType = "default_count_type"
         static let defaultLayoutMode = "default_layout_mode"
         static let showShareAfterSave = "show_share_after_save"
+        static let appearanceMode = "appearance_mode"
         static let languageMode = "language_mode"
         static let updatedAt = "settings_updated_at"
     }
@@ -48,7 +49,11 @@ final class SettingsRepositoryImpl: SettingsRepositoryProtocol {
             showShare = defaults.showShareAfterSave
         }
 
-        let language = all[Key.languageMode] ?? defaults.languageMode
+        let appearanceMode = all[Key.appearanceMode]
+            .flatMap { AppAppearanceMode(rawValue: $0) } ?? defaults.appearanceMode
+
+        let language = all[Key.languageMode]
+            .map { AppLanguage(storageValue: $0) } ?? defaults.languageMode
 
         let updatedAt = all[Key.updatedAt] ?? defaults.updatedAt
 
@@ -57,6 +62,7 @@ final class SettingsRepositoryImpl: SettingsRepositoryProtocol {
             defaultCountType: countType,
             defaultLayoutMode: layoutMode,
             showShareAfterSave: showShare,
+            appearanceMode: appearanceMode,
             languageMode: language,
             updatedAt: updatedAt
         )
@@ -82,8 +88,12 @@ final class SettingsRepositoryImpl: SettingsRepositoryProtocol {
             value: settings.showShareAfterSave ? "1" : "0"
         )
         try dataSource.setValue(
+            key: Key.appearanceMode,
+            value: settings.appearanceMode.rawValue
+        )
+        try dataSource.setValue(
             key: Key.languageMode,
-            value: settings.languageMode
+            value: settings.languageMode.rawValue
         )
         let now = ISO8601DateFormatter().string(from: Date())
         try dataSource.setValue(

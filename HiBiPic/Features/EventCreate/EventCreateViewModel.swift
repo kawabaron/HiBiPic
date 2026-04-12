@@ -25,6 +25,10 @@ final class EventCreateViewModel {
 
     var designTemplateId: DesignTemplateType = .minimal
 
+    var fontPreset: FontPreset = .standard {
+        didSet { isDirty = true }
+    }
+
     var layoutMode: LayoutMode = .single
 
     var customPhraseMode: Bool = false {
@@ -76,7 +80,7 @@ final class EventCreateViewModel {
     }
 
     var previewText: (singleLine: String, line1: String, line2: String) {
-        let label = eventName.isEmpty ? "イベント" : eventName
+        let label = eventName.isEmpty ? L10n.t("fallback.preview.name") : eventName
         let n = currentDayCount
 
         if customPhraseMode {
@@ -93,7 +97,12 @@ final class EventCreateViewModel {
         }
 
         guard let template = currentPhraseTemplate else {
-            return (singleLine: "\(label) \(n)日", line1: label, line2: "\(n)日")
+            let countText = LocalizedDayCountFormatter.string(days: n, countType: countType, showsTodayForZeroCountdown: false)
+            return (
+                singleLine: "\(label) \(countText)",
+                line1: label,
+                line2: countText
+            )
         }
 
         let store = PhraseTemplateStore()
@@ -129,6 +138,7 @@ final class EventCreateViewModel {
             countType = event.countType
             phraseTemplateId = event.phraseTemplateId
             designTemplateId = event.designTemplateId
+            fontPreset = event.fontPreset
             layoutMode = event.layoutMode
             customPhraseMode = event.customPhraseMode
             customSingleLine = event.customSingleLine ?? ""
@@ -137,7 +147,9 @@ final class EventCreateViewModel {
             isPinned = event.isPinned
         } else {
             // Defaults for new event
-            let defaultTemplate = PhraseTemplateStore.defaultTemplate(for: countType)
+            let design = DesignTemplateStore.template(for: designTemplateId)
+            let defaultTemplate = design.defaultPhraseTemplate(for: countType)
+            fontPreset = design.defaultFontPreset
             phraseTemplateId = defaultTemplate.id
             layoutMode = defaultTemplate.layoutMode
         }
@@ -152,7 +164,8 @@ final class EventCreateViewModel {
         isDirty = true
 
         if !customPhraseMode {
-            let defaultTemplate = PhraseTemplateStore.defaultTemplate(for: type)
+            let design = DesignTemplateStore.template(for: designTemplateId)
+            let defaultTemplate = design.defaultPhraseTemplate(for: type)
             phraseTemplateId = defaultTemplate.id
             layoutMode = defaultTemplate.layoutMode
         }
@@ -165,15 +178,15 @@ final class EventCreateViewModel {
         isDirty = true
 
         let design = DesignTemplateStore.template(for: type)
-        layoutMode = design.defaultLayoutMode
+        fontPreset = design.defaultFontPreset
 
         // Re-select a phrase template matching the new layout mode if not custom
         if !customPhraseMode {
-            let candidates = PhraseTemplateStore.templates(for: countType)
-                .filter { $0.layoutMode == layoutMode }
-            if let match = candidates.first(where: { $0.isRecommended }) ?? candidates.first {
-                phraseTemplateId = match.id
-            }
+            let template = design.defaultPhraseTemplate(for: countType)
+            phraseTemplateId = template.id
+            layoutMode = template.layoutMode
+        } else {
+            layoutMode = design.defaultLayoutMode
         }
     }
 
@@ -190,7 +203,7 @@ final class EventCreateViewModel {
     func validate() -> Bool {
         let trimmed = eventName.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty {
-            eventNameError = "イベント名を入力してください"
+            eventNameError = L10n.t("イベント名を入力してください")
             return false
         }
         eventNameError = nil
@@ -215,6 +228,7 @@ final class EventCreateViewModel {
                 updated.countType = countType
                 updated.phraseTemplateId = phraseTemplateId
                 updated.designTemplateId = designTemplateId
+                updated.fontPreset = fontPreset
                 updated.layoutMode = layoutMode
                 updated.customPhraseMode = customPhraseMode
                 updated.customSingleLine = customPhraseMode ? customSingleLine : nil
@@ -231,6 +245,7 @@ final class EventCreateViewModel {
                     countType: countType,
                     phraseTemplateId: phraseTemplateId,
                     designTemplateId: designTemplateId,
+                    fontPreset: fontPreset,
                     layoutMode: layoutMode,
                     customPhraseMode: customPhraseMode,
                     customSingleLine: customPhraseMode ? customSingleLine : nil,
@@ -241,12 +256,12 @@ final class EventCreateViewModel {
                 try repository.create(event)
             }
 
-            toast = .success(isEditing ? "イベントを更新しました" : "イベントを作成しました")
+            toast = .success(isEditing ? L10n.t("イベントを更新しました") : L10n.t("イベントを作成しました"))
             isDirty = false
             return true
 
         } catch {
-            toast = .error("保存に失敗しました。もう一度お試しください。")
+            toast = .error(L10n.t("保存に失敗しました。もう一度お試しください。"))
             return false
         }
     }

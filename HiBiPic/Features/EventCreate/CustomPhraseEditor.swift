@@ -1,8 +1,9 @@
 import SwiftUI
+import UIKit
 
 // MARK: - CustomPhraseEditor
 
-/// Editor for custom phrase input. Supports single-line and double-line modes.
+/// Editor for custom phrase input. Supports single-line and multi-line modes.
 /// The day count is shown as a non-editable preview so the user understands
 /// how `{n}` and `{label}` will resolve.
 struct CustomPhraseEditor: View {
@@ -13,9 +14,12 @@ struct CustomPhraseEditor: View {
     @Binding var customSingleLine: String
     @Binding var customLine1: String
     @Binding var customLine2: String
+    @Binding var customLine3: String
 
     let eventName: String
     let dayCount: Int
+
+    @State private var copiedPlaceholder: String?
 
     // MARK: - Body
 
@@ -28,7 +32,7 @@ struct CustomPhraseEditor: View {
             if layoutMode == .single {
                 singleLineInput
             } else {
-                doubleLineInput
+                multiLineInput
             }
 
             // Hint text
@@ -51,8 +55,8 @@ struct CustomPhraseEditor: View {
             selection: $layoutMode,
             label: { mode in
                 switch mode {
-                case .single: return "1行"
-                case .double: return "2行"
+                case .single: return L10n.t("1行")
+                case .double: return L10n.t("2-3行")
                 }
             }
         )
@@ -62,7 +66,7 @@ struct CustomPhraseEditor: View {
 
     private var singleLineInput: some View {
         VStack(alignment: .leading, spacing: DSSpacing.sm) {
-            TextField("例: {label}から {n}日目", text: $customSingleLine)
+            TextField(L10n.t("例: {label}から {n}日目"), text: $customSingleLine)
                 .font(DSTypography.body)
                 .foregroundStyle(DSColors.textPrimary)
                 .padding(.horizontal, DSSpacing.md)
@@ -77,45 +81,54 @@ struct CustomPhraseEditor: View {
         }
     }
 
-    // MARK: - Double Line Input
+    // MARK: - Multi Line Input
 
-    private var doubleLineInput: some View {
+    private var multiLineInput: some View {
         VStack(alignment: .leading, spacing: DSSpacing.md) {
-            VStack(alignment: .leading, spacing: DSSpacing.xs) {
-                Text("1行目")
-                    .font(DSTypography.caption)
-                    .foregroundStyle(DSColors.textSecondary)
-
-                TextField("例: {label}", text: $customLine1)
-                    .font(DSTypography.body)
-                    .foregroundStyle(DSColors.textPrimary)
-                    .padding(.horizontal, DSSpacing.md)
-                    .padding(.vertical, DSSpacing.md)
-                    .background(DSColors.secondaryBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerMd, style: .continuous))
-            }
-
-            VStack(alignment: .leading, spacing: DSSpacing.xs) {
-                Text("2行目")
-                    .font(DSTypography.caption)
-                    .foregroundStyle(DSColors.textSecondary)
-
-                TextField("例: {n}日目", text: $customLine2)
-                    .font(DSTypography.body)
-                    .foregroundStyle(DSColors.textPrimary)
-                    .padding(.horizontal, DSSpacing.md)
-                    .padding(.vertical, DSSpacing.md)
-                    .background(DSColors.secondaryBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerMd, style: .continuous))
-            }
+            lineInput(
+                title: L10n.t("1行目"),
+                placeholder: L10n.t("例: {label}"),
+                text: $customLine1
+            )
+            lineInput(
+                title: L10n.t("2行目"),
+                placeholder: L10n.t("例: あと{n}日"),
+                text: $customLine2
+            )
+            lineInput(
+                title: L10n.t("3行目"),
+                placeholder: L10n.t("例: 記録更新中"),
+                text: $customLine3
+            )
 
             // Live preview of resolved text
-            if !customLine1.isEmpty || !customLine2.isEmpty {
+            if !customLine1.isEmpty || !customLine2.isEmpty || !customLine3.isEmpty {
                 VStack(spacing: DSSpacing.xxs) {
                     resolvedPreview(customLine1)
                     resolvedPreview(customLine2)
+                    resolvedPreview(customLine3)
                 }
             }
+        }
+    }
+
+    private func lineInput(
+        title: String,
+        placeholder: String,
+        text: Binding<String>
+    ) -> some View {
+        VStack(alignment: .leading, spacing: DSSpacing.xs) {
+            Text(title)
+                .font(DSTypography.caption)
+                .foregroundStyle(DSColors.textSecondary)
+
+            TextField(placeholder, text: text)
+                .font(DSTypography.body)
+                .foregroundStyle(DSColors.textPrimary)
+                .padding(.horizontal, DSSpacing.md)
+                .padding(.vertical, DSSpacing.md)
+                .background(DSColors.secondaryBackground)
+                .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerMd, style: .continuous))
         }
     }
 
@@ -123,9 +136,11 @@ struct CustomPhraseEditor: View {
 
     @ViewBuilder
     private func resolvedPreview(_ template: String) -> some View {
-        let resolved = template
-            .replacingOccurrences(of: "{n}", with: String(dayCount))
-            .replacingOccurrences(of: "{label}", with: eventName.isEmpty ? "イベント" : eventName)
+        let resolved = PlaceholderTextResolver.resolve(
+            template: template,
+            label: eventName,
+            count: dayCount
+        )
 
         if !resolved.isEmpty {
             HStack(spacing: DSSpacing.xs) {
@@ -144,31 +159,51 @@ struct CustomPhraseEditor: View {
 
     private var hintView: some View {
         VStack(alignment: .leading, spacing: DSSpacing.xs) {
-            Text("使えるプレースホルダー:")
+            Text(L10n.t("使えるプレースホルダー:"))
                 .font(DSTypography.caption)
                 .foregroundStyle(DSColors.textTertiary)
 
             HStack(spacing: DSSpacing.lg) {
-                hintChip("{label}", description: "イベント名")
-                hintChip("{n}", description: "日数")
+                hintChip("{label}", description: L10n.t("イベント名"))
+                hintChip("{n}", description: L10n.t("日数"))
+            }
+
+            if let copiedPlaceholder {
+                Text(L10n.f("%@ をコピーしました", copiedPlaceholder))
+                    .font(DSTypography.caption)
+                    .foregroundStyle(DSColors.accent)
+            } else {
+                Text(L10n.t("タップでコピーできます"))
+                    .font(DSTypography.caption)
+                    .foregroundStyle(DSColors.accent)
             }
         }
     }
 
     private func hintChip(_ code: String, description: String) -> some View {
-        HStack(spacing: DSSpacing.xs) {
-            Text(code)
-                .font(DSTypography.caption.monospaced())
-                .foregroundStyle(DSColors.accent)
-                .padding(.horizontal, DSSpacing.sm)
-                .padding(.vertical, DSSpacing.xxs)
-                .background(DSColors.accentLight.opacity(0.3))
-                .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerSm, style: .continuous))
+        Button {
+            UIPasteboard.general.string = code
+            copiedPlaceholder = code
+        } label: {
+            HStack(spacing: DSSpacing.xs) {
+                Text(code)
+                    .font(DSTypography.caption.monospaced())
+                    .foregroundStyle(DSColors.accent)
+                    .padding(.horizontal, DSSpacing.sm)
+                    .padding(.vertical, DSSpacing.xxs)
+                    .background(DSColors.accentLight.opacity(0.3))
+                    .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerSm, style: .continuous))
 
-            Text(description)
-                .font(DSTypography.caption)
-                .foregroundStyle(DSColors.textTertiary)
+                Text(description)
+                    .font(DSTypography.caption)
+                    .foregroundStyle(DSColors.textTertiary)
+
+                Image(systemName: "doc.on.doc")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(DSColors.textTertiary)
+            }
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -181,6 +216,7 @@ struct CustomPhraseEditor: View {
             customSingleLine: .constant("{label}から {n}日目"),
             customLine1: .constant(""),
             customLine2: .constant(""),
+            customLine3: .constant(""),
             eventName: "禁煙",
             dayCount: 30
         )
@@ -190,6 +226,7 @@ struct CustomPhraseEditor: View {
             customSingleLine: .constant(""),
             customLine1: .constant("{label}"),
             customLine2: .constant("{n}日目"),
+            customLine3: .constant("がんばり中"),
             eventName: "禁煙",
             dayCount: 30
         )

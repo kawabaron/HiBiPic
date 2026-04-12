@@ -19,6 +19,7 @@ struct EventSelectSheet: View {
                     } label: {
                         eventRow(event)
                     }
+                    .buttonStyle(.plain)
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(
@@ -32,14 +33,14 @@ struct EventSelectSheet: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .background(DSColors.background)
-            .navigationTitle("イベントを選択")
+            .navigationTitle(L10n.t("イベントを選択"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         onDismiss()
                     } label: {
-                        Text("閉じる")
+                        Text(L10n.t("閉じる"))
                             .font(DSTypography.callout)
                             .foregroundStyle(DSColors.accent)
                     }
@@ -86,15 +87,20 @@ struct EventSelectSheet: View {
         case .soft:    return DSColors.accentLight
         case .film:    return DSColors.warning
         case .poster:  return DSColors.accent
+        case .classic: return Color(hex: "BFA889")
+        case .diary: return Color(hex: "D69B6F")
+        case .cleanLabel: return Color(hex: "8FA3B0")
+        case .memory: return Color(hex: "C9B28A")
+        case .milestone: return Color(hex: "6DA6B8")
+        case .airy: return Color(hex: "9BCBB8")
         }
     }
 
     private func daySummary(_ event: Event) -> String {
         let days = DateCalculator.calculateDays(baseDate: event.baseDate, countType: event.countType)
         switch event.countType {
-        case .countdown: return "あと\(days)日"
-        case .elapsed:   return "\(days)日経過"
-        case .daycount:  return "\(days)日目"
+        case .countdown, .elapsed, .daycount:
+            return LocalizedDayCountFormatter.string(days: days, countType: event.countType, showsTodayForZeroCountdown: false)
         }
     }
 }

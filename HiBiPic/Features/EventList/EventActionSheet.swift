@@ -19,9 +19,9 @@ enum EventAction: Identifiable {
     /// Localised label for the action row.
     var label: String {
         switch self {
-        case .camera:      return "このイベントで撮る"
-        case .photoPicker: return "写真を選ぶ"
-        case .edit:        return "イベントを編集"
+        case .camera:      return L10n.t("このイベントで撮る")
+        case .photoPicker: return L10n.t("写真を選ぶ")
+        case .edit:        return L10n.t("イベントを編集")
         }
     }
 
@@ -163,7 +163,7 @@ struct EventActionSheet: View {
         Button {
             onDismiss()
         } label: {
-            Text("キャンセル")
+            Text(L10n.t("キャンセル"))
                 .font(DSTypography.headline)
                 .foregroundStyle(DSColors.textSecondary)
                 .frame(maxWidth: .infinity)
@@ -182,12 +182,8 @@ struct EventActionSheet: View {
             countType: event.countType
         )
         switch event.countType {
-        case .countdown:
-            return days == 0 ? "当日" : "あと\(days)日"
-        case .elapsed:
-            return "\(days)日経過"
-        case .daycount:
-            return "\(days)日目"
+        case .countdown, .elapsed, .daycount:
+            return LocalizedDayCountFormatter.string(days: days, countType: event.countType)
         }
     }
 }

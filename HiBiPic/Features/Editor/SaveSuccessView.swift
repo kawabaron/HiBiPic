@@ -37,11 +37,11 @@ struct SaveSuccessView: View {
 
                 // Success message
                 VStack(spacing: DSSpacing.sm) {
-                    Text("保存しました")
+                    Text(L10n.t("保存しました"))
                         .font(DSTypography.title)
                         .foregroundStyle(.white)
 
-                    Text("ライブラリに保存しました")
+                    Text(L10n.t("ライブラリに保存しました"))
                         .font(DSTypography.callout)
                         .foregroundStyle(.white.opacity(0.7))
                 }
@@ -53,7 +53,7 @@ struct SaveSuccessView: View {
                     VStack(spacing: DSSpacing.md) {
                         // Save to iPhone Photos
                         actionButton(
-                            title: savedToPhotos ? "保存しました" : "iPhoneの写真に保存",
+                            title: savedToPhotos ? L10n.t("保存しました") : L10n.t("iPhoneの写真に保存"),
                             icon: savedToPhotos ? "checkmark" : "square.and.arrow.down",
                             style: .primary,
                             disabled: savedToPhotos
@@ -64,7 +64,7 @@ struct SaveSuccessView: View {
 
                         // Share
                         actionButton(
-                            title: "共有する",
+                            title: L10n.t("共有する"),
                             icon: "square.and.arrow.up",
                             style: .secondary
                         ) {
@@ -73,7 +73,7 @@ struct SaveSuccessView: View {
 
                         // Back to library
                         actionButton(
-                            title: "ライブラリへ戻る",
+                            title: L10n.t("ライブラリへ戻る"),
                             icon: "photo.on.rectangle",
                             style: .text
                         ) {

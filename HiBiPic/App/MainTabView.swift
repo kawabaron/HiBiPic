@@ -21,6 +21,19 @@ enum AppTab: Hashable {
 /// attached here so they work regardless of the active tab.
 struct MainTabView: View {
 
+    private enum CaptureFlowTiming {
+        static let eventSelectionDismissDelay: TimeInterval = 0.28
+        static let actionSheetDismissDelay: TimeInterval = 0.3
+    }
+
+    @Binding var appearanceMode: AppAppearanceMode
+    @Binding var languageMode: AppLanguage
+
+    private struct CaptureEventSelectionSession: Identifiable {
+        let id = UUID()
+        let events: [Event]
+    }
+
     // MARK: - State
 
     @State private var selectedTab: AppTab = .library
@@ -28,11 +41,10 @@ struct MainTabView: View {
     @State private var coordinator = NavigationCoordinator()
 
     // Capture flow state
-    @State private var showEventSelectSheet = false
-    @State private var showCaptureActionSheet = false
     @State private var captureSelectedEvent: Event?
-    @State private var captureEvents: [Event] = []
+    @State private var eventSelectionSession: CaptureEventSelectionSession?
     @State private var showNoEventsAlert = false
+    @State private var showSettings = false
 
     // MARK: - Body
 
@@ -40,24 +52,33 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             // Tab 1: ライブラリ
             NavigationStack {
-                LibraryScreen()
+                LibraryScreen(
+                    onSettingsTap: {
+                        showSettings = true
+                    }
+                )
             }
             .tabItem {
-                Label("ライブラリ", systemImage: "photo.on.rectangle")
+                Label(L10n.t("ライブラリ"), systemImage: "photo.on.rectangle")
             }
             .tag(AppTab.library)
 
             // Tab 2: 撮る (virtual – no real content)
             Color.clear
                 .tabItem {
-                    Label("撮る", systemImage: "camera.fill")
+                    Label(L10n.t("撮る"), systemImage: "camera.fill")
                 }
                 .tag(AppTab.capture)
 
             // Tab 3: イベント
-            RootNavigationView(coordinator: coordinator)
+            RootNavigationView(
+                coordinator: coordinator,
+                onSettingsTap: {
+                    showSettings = true
+                }
+            )
                 .tabItem {
-                    Label("イベント", systemImage: "calendar")
+                    Label(L10n.t("イベント"), systemImage: "calendar")
                 }
                 .tag(AppTab.events)
         }
@@ -71,21 +92,28 @@ struct MainTabView: View {
                 previousTab = newValue
             }
         }
+        .sheet(isPresented: $showSettings) {
+            NavigationStack {
+                SettingsScreen(
+                    appearanceMode: $appearanceMode,
+                    languageMode: $languageMode
+                )
+            }
+        }
 
-        // MARK: - Event Select Sheet
-
-        .sheet(isPresented: $showEventSelectSheet) {
+        .sheet(item: $eventSelectionSession) { session in
             EventSelectSheet(
-                events: captureEvents,
+                events: session.events,
                 onEventSelected: { event in
-                    showEventSelectSheet = false
-                    captureSelectedEvent = event
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showCaptureActionSheet = true
+                    eventSelectionSession = nil
+                    DispatchQueue.main.asyncAfter(
+                        deadline: .now() + CaptureFlowTiming.eventSelectionDismissDelay
+                    ) {
+                        presentCaptureActionSheet(for: event)
                     }
                 },
                 onDismiss: {
-                    showEventSelectSheet = false
+                    eventSelectionSession = nil
                 }
             )
             .presentationDetents([.medium, .large])
@@ -93,17 +121,15 @@ struct MainTabView: View {
 
         // MARK: - Capture Action Sheet
 
-        .sheet(isPresented: $showCaptureActionSheet) {
-            if let event = captureSelectedEvent {
-                captureActionSheetContent(for: event)
-                    .presentationDetents([.height(280)])
-            }
+        .sheet(item: $captureSelectedEvent) { event in
+            captureActionSheetContent(for: event)
+                .presentationDetents([.height(280)])
         }
 
         // MARK: - Modal Presentations (shared across tabs)
 
         .sheet(isPresented: $coordinator.showCreateEvent, onDismiss: {
-            coordinator.editingEvent = nil
+            coordinator.handleCreateEventDismiss()
         }) {
             NavigationStack {
                 EventCreateScreen(event: coordinator.editingEvent)
@@ -111,40 +137,33 @@ struct MainTabView: View {
             .interactiveDismissDisabled(false)
         }
 
-        .sheet(isPresented: $coordinator.showPhotoPicker) {
+        .sheet(isPresented: $coordinator.showPhotoPicker, onDismiss: {
+            coordinator.presentDeferredRouteIfNeeded()
+        }) {
             if let event = coordinator.selectedEvent {
                 PhotoPickerScreen(
-                    event: event,
-                    selectedImage: Binding(
-                        get: { coordinator.selectedImage },
-                        set: { coordinator.selectedImage = $0 }
-                    ),
                     isPresented: $coordinator.showPhotoPicker,
                     onImageSelected: { image in
+                        coordinator.queueEditorPresentation(image: image, event: event)
                         coordinator.showPhotoPicker = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            coordinator.navigateToEditor(image: image, event: event)
-                        }
                     }
                 )
             }
         }
 
-        .fullScreenCover(isPresented: $coordinator.showCamera) {
+        .fullScreenCover(isPresented: $coordinator.showCamera, onDismiss: {
+            coordinator.presentDeferredRouteIfNeeded()
+        }) {
             if let event = coordinator.selectedEvent {
                 CameraScreen(
                     event: event,
                     onImageCaptured: { image in
+                        coordinator.queueEditorPresentation(image: image, event: event)
                         coordinator.showCamera = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            coordinator.navigateToEditor(image: image, event: event)
-                        }
                     },
                     onPickerRequested: {
+                        coordinator.queuePhotoPickerPresentation(event: event)
                         coordinator.showCamera = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                            coordinator.navigateToPhotoPicker(event: event)
-                        }
                     },
                     onDismiss: {
                         coordinator.showCamera = false
@@ -154,30 +173,27 @@ struct MainTabView: View {
         }
 
         .fullScreenCover(isPresented: $coordinator.showEditor, onDismiss: {
-            coordinator.capturedImage = nil
-            coordinator.selectedImage = nil
-            NotificationCenter.default.post(name: .libraryDidChange, object: nil)
+            coordinator.handleEditorDismiss()
         }) {
-            if let image = coordinator.capturedImage,
-               let event = coordinator.selectedEvent {
+            if let viewModel = coordinator.editorViewModel {
                 EditorScreen(
-                    viewModel: EditorViewModel(image: image, event: event)
+                    viewModel: viewModel
                 )
             }
         }
 
         // MARK: - No Events Alert
 
-        .alert("イベントがありません", isPresented: $showNoEventsAlert) {
-            Button("イベントを作成") {
+        .alert(L10n.t("イベントがありません"), isPresented: $showNoEventsAlert) {
+            Button(L10n.t("イベントを作成")) {
                 selectedTab = .events
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     coordinator.navigateToCreateEvent()
                 }
             }
-            Button("キャンセル", role: .cancel) {}
+            Button(L10n.t("キャンセル"), role: .cancel) {}
         } message: {
-            Text("写真を撮るにはイベントを作成してください")
+            Text(L10n.t("写真を撮るにはイベントを作成してください"))
         }
     }
 
@@ -189,19 +205,18 @@ struct MainTabView: View {
                 isArchived: false,
                 sort: "last_used_at"
             )
-            captureEvents = events
 
             switch events.count {
             case 0:
                 showNoEventsAlert = true
 
             case 1:
-                // Skip event selection – go directly to action sheet
-                captureSelectedEvent = events[0]
-                showCaptureActionSheet = true
+                presentCaptureActionSheet(for: events[0])
 
             default:
-                showEventSelectSheet = true
+                DispatchQueue.main.async {
+                    eventSelectionSession = CaptureEventSelectionSession(events: events)
+                }
             }
         } catch {
             showNoEventsAlert = true
@@ -224,8 +239,7 @@ struct MainTabView: View {
 
             VStack(spacing: DSSpacing.md) {
                 Button {
-                    showCaptureActionSheet = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    dismissCaptureActionSheet(after: CaptureFlowTiming.actionSheetDismissDelay) {
                         coordinator.navigateToCamera(event: event)
                     }
                 } label: {
@@ -234,7 +248,7 @@ struct MainTabView: View {
                             .font(.system(size: 20))
                             .foregroundStyle(DSColors.accent)
                             .frame(width: 32)
-                        Text("カメラで撮る")
+                        Text(L10n.t("カメラで撮る"))
                             .font(DSTypography.body)
                             .foregroundStyle(DSColors.textPrimary)
                         Spacer()
@@ -249,8 +263,7 @@ struct MainTabView: View {
                 .buttonStyle(.plain)
 
                 Button {
-                    showCaptureActionSheet = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    dismissCaptureActionSheet(after: CaptureFlowTiming.actionSheetDismissDelay) {
                         coordinator.navigateToPhotoPicker(event: event)
                     }
                 } label: {
@@ -259,7 +272,7 @@ struct MainTabView: View {
                             .font(.system(size: 20))
                             .foregroundStyle(DSColors.warning)
                             .frame(width: 32)
-                        Text("写真から選ぶ")
+                        Text(L10n.t("写真から選ぶ"))
                             .font(DSTypography.body)
                             .foregroundStyle(DSColors.textPrimary)
                         Spacer()
@@ -278,6 +291,20 @@ struct MainTabView: View {
             Spacer()
         }
         .background(DSColors.background)
+    }
+
+    private func presentCaptureActionSheet(for event: Event) {
+        captureSelectedEvent = event
+    }
+
+    private func dismissCaptureActionSheet(
+        after delay: TimeInterval,
+        perform action: @escaping () -> Void
+    ) {
+        captureSelectedEvent = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            action()
+        }
     }
 }
 

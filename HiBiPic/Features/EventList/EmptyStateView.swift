@@ -60,12 +60,12 @@ struct EmptyStateView: View {
 
     private var textGroup: some View {
         VStack(spacing: DSSpacing.sm) {
-            Text("まだイベントがありません")
+            Text(L10n.t("まだイベントがありません"))
                 .font(DSTypography.title)
                 .foregroundStyle(DSColors.textPrimary)
                 .multilineTextAlignment(.center)
 
-            Text("大切な日を登録して、写真に残しましょう")
+            Text(L10n.t("大切な日を登録して、写真に残しましょう"))
                 .font(DSTypography.subheadline)
                 .foregroundStyle(DSColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -76,7 +76,7 @@ struct EmptyStateView: View {
 
     private var createButton: some View {
         DSButton(
-            "最初のイベントを作成",
+            L10n.t("最初のイベントを作成"),
             style: .primary,
             fullWidth: false,
             icon: Image(systemName: "plus")

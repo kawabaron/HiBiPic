@@ -22,10 +22,10 @@ enum EventSortType: CaseIterable {
     /// Localised label shown in the sort picker.
     var displayName: String {
         switch self {
-        case .pinnedThenRecent: return "ピン留め優先"
-        case .createdDesc:     return "作成日（新しい順）"
-        case .updatedDesc:     return "更新日（新しい順）"
-        case .nameAsc:         return "名前順"
+        case .pinnedThenRecent: return L10n.t("ピン留め優先")
+        case .createdDesc:     return L10n.t("作成日（新しい順）")
+        case .updatedDesc:     return L10n.t("更新日（新しい順）")
+        case .nameAsc:         return L10n.t("名前順")
         }
     }
 

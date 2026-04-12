@@ -70,12 +70,12 @@ struct LibraryGridView: View {
             }
 
             VStack(spacing: DSSpacing.sm) {
-                Text("まだ画像がありません")
+                Text(L10n.t("まだ画像がありません"))
                     .font(DSTypography.title)
                     .foregroundStyle(DSColors.textPrimary)
                     .multilineTextAlignment(.center)
 
-                Text("写真を撮って日数を印字しましょう")
+                Text(L10n.t("写真を撮って日数を印字しましょう"))
                     .font(DSTypography.subheadline)
                     .foregroundStyle(DSColors.textSecondary)
                     .multilineTextAlignment(.center)

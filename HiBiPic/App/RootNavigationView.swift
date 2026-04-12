@@ -10,6 +10,11 @@ import SwiftUI
 @Observable
 final class NavigationCoordinator {
 
+    enum DeferredRoute {
+        case photoPicker(Event)
+        case editor(image: UIImage, event: Event)
+    }
+
     // MARK: - Sheet / Cover Presentations
 
     var showCreateEvent = false
@@ -21,8 +26,8 @@ final class NavigationCoordinator {
 
     var editingEvent: Event?
     var selectedEvent: Event?
-    var capturedImage: UIImage?
-    var selectedImage: UIImage?
+    var editorViewModel: EditorViewModel?
+    var deferredRoute: DeferredRoute?
 
     // MARK: - Navigation Methods
 
@@ -47,9 +52,31 @@ final class NavigationCoordinator {
     }
 
     func navigateToEditor(image: UIImage, event: Event) {
-        capturedImage = image
         selectedEvent = event
+        editorViewModel = EditorViewModel(image: image, event: event)
         showEditor = true
+    }
+
+    func queuePhotoPickerPresentation(event: Event) {
+        deferredRoute = .photoPicker(event)
+    }
+
+    func queueEditorPresentation(image: UIImage, event: Event) {
+        deferredRoute = .editor(image: image, event: event)
+    }
+
+    func presentDeferredRouteIfNeeded() {
+        guard !showCreateEvent, !showCamera, !showPhotoPicker, !showEditor else { return }
+        guard let deferredRoute else { return }
+
+        self.deferredRoute = nil
+
+        switch deferredRoute {
+        case let .photoPicker(event):
+            navigateToPhotoPicker(event: event)
+        case let .editor(image, event):
+            navigateToEditor(image: image, event: event)
+        }
     }
 
     func returnToList() {
@@ -71,13 +98,23 @@ final class NavigationCoordinator {
         clearTransientState()
     }
 
+    func handleCreateEventDismiss() {
+        editingEvent = nil
+        NotificationCenter.default.post(name: .eventListDidChange, object: nil)
+    }
+
+    func handleEditorDismiss() {
+        editorViewModel = nil
+        NotificationCenter.default.post(name: .libraryDidChange, object: nil)
+    }
+
     // MARK: - Private
 
     private func clearTransientState() {
         editingEvent = nil
         selectedEvent = nil
-        capturedImage = nil
-        selectedImage = nil
+        editorViewModel = nil
+        deferredRoute = nil
     }
 }
 
@@ -90,6 +127,7 @@ struct RootNavigationView: View {
     // MARK: - State
 
     @Bindable var coordinator: NavigationCoordinator
+    var onSettingsTap: (() -> Void)?
     @State private var viewModel = EventListViewModel()
 
     /// The event shown in the custom action sheet overlay.
@@ -109,19 +147,19 @@ struct RootNavigationView: View {
                     .ignoresSafeArea()
 
                 eventListContent
-                    .navigationTitle("イベント")
+                    .navigationTitle(L10n.t("イベント"))
                     .toolbar { toolbarItems }
                     .alert(
-                        "イベントを削除",
+                        L10n.t("イベントを削除"),
                         isPresented: $viewModel.showDeleteConfirm,
                         presenting: viewModel.eventToDelete
                     ) { _ in
-                        Button("削除", role: .destructive) {
+                        Button(L10n.t("削除"), role: .destructive) {
                             viewModel.confirmDelete()
                         }
-                        Button("キャンセル", role: .cancel) {}
+                        Button(L10n.t("キャンセル"), role: .cancel) {}
                     } message: { event in
-                        Text("「\(event.name)」を削除しますか？この操作は取り消せません。")
+                        Text(L10n.f("「%@」を削除しますか？この操作は取り消せません。", event.name))
                     }
 
                 // Custom action sheet overlay
@@ -144,6 +182,12 @@ struct RootNavigationView: View {
             }
         }
         .onAppear {
+            viewModel.loadEvents()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .libraryDidChange)) { _ in
+            viewModel.loadEvents()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .eventListDidChange)) { _ in
             viewModel.loadEvents()
         }
     }
@@ -220,7 +264,7 @@ struct RootNavigationView: View {
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(DSColors.textTertiary)
 
-            Text(title)
+            Text(L10n.t(title))
                 .font(DSTypography.footnote)
                 .foregroundStyle(DSColors.textTertiary)
                 .textCase(.none)
@@ -250,13 +294,13 @@ struct RootNavigationView: View {
             Button(role: .destructive) {
                 viewModel.deleteEvent(event: event)
             } label: {
-                Label("削除", systemImage: "trash")
+                Label(L10n.t("削除"), systemImage: "trash")
             }
 
             Button {
                 viewModel.archiveEvent(event: event)
             } label: {
-                Label("アーカイブ", systemImage: "archivebox")
+                Label(L10n.t("アーカイブ"), systemImage: "archivebox")
             }
             .tint(DSColors.warning)
         }
@@ -265,7 +309,7 @@ struct RootNavigationView: View {
                 viewModel.togglePin(event: event)
             } label: {
                 Label(
-                    event.isPinned ? "ピン解除" : "ピン留め",
+                    event.isPinned ? L10n.t("ピン解除") : L10n.t("ピン留め"),
                     systemImage: event.isPinned ? "pin.slash" : "pin"
                 )
             }
@@ -276,7 +320,7 @@ struct RootNavigationView: View {
                 viewModel.togglePin(event: event)
             } label: {
                 Label(
-                    event.isPinned ? "ピン解除" : "ピン留め",
+                    event.isPinned ? L10n.t("ピン解除") : L10n.t("ピン留め"),
                     systemImage: event.isPinned ? "pin.slash.fill" : "pin.fill"
                 )
             }
@@ -284,7 +328,7 @@ struct RootNavigationView: View {
             Button {
                 viewModel.archiveEvent(event: event)
             } label: {
-                Label("アーカイブ", systemImage: "archivebox.fill")
+                Label(L10n.t("アーカイブ"), systemImage: "archivebox.fill")
             }
 
             Divider()
@@ -292,7 +336,7 @@ struct RootNavigationView: View {
             Button(role: .destructive) {
                 viewModel.deleteEvent(event: event)
             } label: {
-                Label("削除", systemImage: "trash.fill")
+                Label(L10n.t("削除"), systemImage: "trash.fill")
             }
         }
     }
@@ -351,6 +395,16 @@ struct RootNavigationView: View {
 
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
+        if let onSettingsTap {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: onSettingsTap) {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundStyle(DSColors.accent)
+                }
+            }
+        }
+
         ToolbarItem(placement: .topBarTrailing) {
             Button {
                 coordinator.navigateToCreateEvent()

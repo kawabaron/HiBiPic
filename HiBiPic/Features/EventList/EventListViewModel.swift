@@ -67,7 +67,7 @@ final class EventListViewModel {
                 sort: sortType.sortColumn
             )
         } catch {
-            errorMessage = "イベントの読み込みに失敗しました"
+            errorMessage = L10n.t("イベントの読み込みに失敗しました")
         }
 
         isLoading = false
@@ -81,7 +81,7 @@ final class EventListViewModel {
             try repository.setPinned(id: event.id, isPinned: !event.isPinned)
             loadEvents()
         } catch {
-            errorMessage = "ピン留めの変更に失敗しました"
+            errorMessage = L10n.t("ピン留めの変更に失敗しました")
         }
     }
 
@@ -93,7 +93,7 @@ final class EventListViewModel {
             try repository.setArchived(id: event.id, isArchived: true)
             loadEvents()
         } catch {
-            errorMessage = "アーカイブに失敗しました"
+            errorMessage = L10n.t("アーカイブに失敗しました")
         }
     }
 
@@ -114,7 +114,7 @@ final class EventListViewModel {
             eventToDelete = nil
             loadEvents()
         } catch {
-            errorMessage = "削除に失敗しました"
+            errorMessage = L10n.t("削除に失敗しました")
         }
     }
 

@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 // MARK: - TextOverlayView
@@ -9,27 +10,26 @@ struct TextOverlayView: View {
     // MARK: - Properties
 
     let designTemplate: DesignTemplate
+    let fontPreset: FontPreset
     let layoutMode: LayoutMode
-    let line1: String
-    let line2: String
-    let singleLine: String
+    let displayText: EditorDisplayText
+    let canvasSize: CGSize
     let scale: CGFloat
+    let textAlignment: TextAlignment
     let colorOverride: Color?
     let showBackground: Bool
+    let backgroundColorHex: String
 
     // MARK: - Derived
 
-    /// The effective text colour: override, or template default.
     private var textColor: Color {
         colorOverride ?? Color(hex: designTemplate.textColor)
     }
 
-    /// The template's background band colour.
     private var bandColor: Color {
-        Color(hex: designTemplate.backgroundColor)
+        Color(hex: backgroundColorHex)
     }
 
-    /// The SwiftUI font weight mapped from the template's weight enum.
     private var fontWeight: Font.Weight {
         switch designTemplate.fontWeight {
         case .thin:     return .thin
@@ -42,46 +42,76 @@ struct TextOverlayView: View {
         }
     }
 
-    /// The base font size before scaling, adjusted per template.
-    private var baseFontSize: CGFloat {
-        18 * designTemplate.fontSizeScale
+    private var metrics: EditorTextLayoutMetrics {
+        EditorTextLayout.metrics(
+            designTemplate: designTemplate,
+            layoutMode: layoutMode,
+            textScale: scale,
+            canvasSize: canvasSize
+        )
     }
 
-    /// The large number font size for double-line layouts with number emphasis.
-    private var numberFontSize: CGFloat {
-        32 * designTemplate.fontSizeScale
+    private var renderedLines: [EditorOverlayLine] {
+        layoutMode == .single ? [] : displayText.multiLines
     }
 
-    /// Text alignment from the template.
     private var horizontalAlignment: HorizontalAlignment {
-        switch designTemplate.alignment {
+        switch textAlignment {
         case .left:   return .leading
         case .center: return .center
         case .right:  return .trailing
         }
     }
 
-    /// Multiline text alignment.
     private var multilineAlignment: SwiftUI.TextAlignment {
-        switch designTemplate.alignment {
+        switch textAlignment {
         case .left:   return .leading
         case .center: return .center
         case .right:  return .trailing
         }
+    }
+
+    private func overlayFont(
+        size: CGFloat,
+        weight: Font.Weight,
+        text: String,
+        isEmphasized: Bool = false
+    ) -> Font {
+        OverlayFontResolver.swiftUIFont(
+            preset: fontPreset,
+            size: size,
+            weight: weight,
+            designTemplate: designTemplate,
+            text: text,
+            isEmphasized: isEmphasized
+        )
+    }
+
+    private func overlayTracking(
+        size: CGFloat,
+        text: String,
+        isEmphasized: Bool = false
+    ) -> CGFloat {
+        OverlayFontResolver.tracking(
+            preset: fontPreset,
+            size: size,
+            designTemplate: designTemplate,
+            text: text,
+            isEmphasized: isEmphasized
+        )
     }
 
     // MARK: - Body
 
     var body: some View {
         templateContent
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.horizontal, metrics.horizontalPadding)
+            .padding(.vertical, metrics.verticalPadding)
             .background {
                 if showBackground {
                     backgroundBand
                 }
             }
-            .scaleEffect(scale)
     }
 
     // MARK: - Template Content
@@ -91,127 +121,292 @@ struct TextOverlayView: View {
         switch designTemplate.id {
         case .minimal:
             minimalLayout
-        case .soft:
+        case .soft, .diary, .cleanLabel, .airy:
             softLayout
-        case .film:
+        case .film, .classic, .memory:
             filmLayout
-        case .poster:
+        case .poster, .milestone:
             posterLayout
         }
     }
 
     // MARK: - Minimal Template
 
-    /// Clean white text, no band, thin weight, centred.
     @ViewBuilder
     private var minimalLayout: some View {
         if layoutMode == .single {
-            Text(singleLine)
-                .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .default))
-                .foregroundStyle(textColor)
-                .multilineTextAlignment(multilineAlignment)
-                .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 1)
-        } else {
-            VStack(alignment: horizontalAlignment, spacing: 4 * scale) {
-                Text(line1)
-                    .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .default))
-                    .foregroundStyle(textColor)
-                Text(line2)
-                    .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .default))
-                    .foregroundStyle(textColor)
-            }
+            styledText(
+                text: displayText.singleLine,
+                fontSize: EditorTextLayout.singleLineFontSize(
+                    metrics: metrics,
+                    scaleMultiplier: displayText.singleLineScaleMultiplier
+                ),
+                weight: fontWeight,
+                numbersOnlyLarge: displayText.singleLineNumbersOnlyLarge
+            )
+            .foregroundStyle(textColor)
             .multilineTextAlignment(multilineAlignment)
             .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 1)
+        } else {
+            multilineStack(
+                lineSpacing: metrics.lineSpacing,
+                shadowColor: .black.opacity(0.5),
+                shadowRadius: 4
+            ) { index, line, lineCount in
+                lineView(
+                    line: line,
+                    index: index,
+                    lineCount: lineCount,
+                    weight: fontWeight
+                )
+                .foregroundStyle(textColor)
+            }
         }
     }
 
     // MARK: - Soft Template
 
-    /// Warm cream text, semi-transparent band, rounded feel, number emphasis.
     @ViewBuilder
     private var softLayout: some View {
         if layoutMode == .single {
-            Text(singleLine)
-                .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .rounded))
-                .foregroundStyle(textColor)
-                .multilineTextAlignment(multilineAlignment)
-        } else {
-            VStack(alignment: horizontalAlignment, spacing: 4 * scale) {
-                Text(line1)
-                    .font(.system(size: (baseFontSize - 2) * scale, weight: fontWeight, design: .rounded))
-                    .foregroundStyle(textColor.opacity(0.9))
-                Text(line2)
-                    .font(.system(
-                        size: (designTemplate.numberEmphasis ? numberFontSize : baseFontSize) * scale,
-                        weight: designTemplate.numberEmphasis ? .semibold : fontWeight,
-                        design: .rounded
-                    ))
-                    .foregroundStyle(textColor)
-            }
+            styledText(
+                text: displayText.singleLine,
+                fontSize: EditorTextLayout.singleLineFontSize(
+                    metrics: metrics,
+                    scaleMultiplier: displayText.singleLineScaleMultiplier
+                ),
+                weight: fontWeight,
+                numbersOnlyLarge: displayText.singleLineNumbersOnlyLarge
+            )
+            .foregroundStyle(textColor)
             .multilineTextAlignment(multilineAlignment)
+        } else {
+            let highlightedIndex = highlightedMultiLineIndex(lineCount: renderedLines.count)
+
+            multilineStack(lineSpacing: metrics.lineSpacing) { index, line, lineCount in
+                lineView(
+                    line: line,
+                    index: index,
+                    lineCount: lineCount,
+                    weight: index == highlightedIndex ? .semibold : fontWeight,
+                    useEmphasizedResolver: index == highlightedIndex
+                )
+                .foregroundStyle(index == highlightedIndex ? textColor : textColor.opacity(0.9))
+            }
         }
     }
 
     // MARK: - Film Template
 
-    /// Off-white text, left-aligned, no band, light weight, retro feel.
     @ViewBuilder
     private var filmLayout: some View {
         if layoutMode == .single {
-            Text(singleLine)
-                .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .default))
-                .foregroundStyle(textColor)
-                .multilineTextAlignment(multilineAlignment)
-                .tracking(0.5)
-                .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
-        } else {
-            VStack(alignment: horizontalAlignment, spacing: 6 * scale) {
-                Text(line1)
-                    .font(.system(size: (baseFontSize - 2) * scale, weight: fontWeight, design: .default))
-                    .foregroundStyle(textColor.opacity(0.85))
-                    .tracking(0.5)
-                Text(line2)
-                    .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .default))
-                    .foregroundStyle(textColor)
-                    .tracking(0.5)
-            }
+            styledText(
+                text: displayText.singleLine,
+                fontSize: EditorTextLayout.singleLineFontSize(
+                    metrics: metrics,
+                    scaleMultiplier: displayText.singleLineScaleMultiplier
+                ),
+                weight: fontWeight,
+                numbersOnlyLarge: displayText.singleLineNumbersOnlyLarge
+            )
+            .foregroundStyle(textColor)
             .multilineTextAlignment(multilineAlignment)
             .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
+        } else {
+            multilineStack(
+                lineSpacing: metrics.lineSpacing,
+                shadowColor: .black.opacity(0.4),
+                shadowRadius: 3
+            ) { index, line, lineCount in
+                lineView(
+                    line: line,
+                    index: index,
+                    lineCount: lineCount,
+                    weight: fontWeight
+                )
+                .foregroundStyle(index == lineCount - 1 ? textColor : textColor.opacity(0.85))
+            }
         }
     }
 
     // MARK: - Poster Template
 
-    /// Large bold numbers, strong text, high contrast band.
     @ViewBuilder
     private var posterLayout: some View {
         if layoutMode == .single {
-            Text(singleLine)
-                .font(.system(size: baseFontSize * scale, weight: fontWeight, design: .rounded))
-                .foregroundStyle(textColor)
-                .multilineTextAlignment(multilineAlignment)
-        } else {
-            VStack(alignment: horizontalAlignment, spacing: 2 * scale) {
-                Text(line1)
-                    .font(.system(size: (baseFontSize - 4) * scale, weight: .medium, design: .rounded))
-                    .foregroundStyle(textColor.opacity(0.9))
-                    .textCase(.uppercase)
-                Text(line2)
-                    .font(.system(
-                        size: (designTemplate.numberEmphasis ? (numberFontSize + 8) : baseFontSize) * scale,
-                        weight: .heavy,
-                        design: .rounded
-                    ))
-                    .foregroundStyle(textColor)
-            }
+            styledText(
+                text: displayText.singleLine,
+                fontSize: EditorTextLayout.singleLineFontSize(
+                    metrics: metrics,
+                    scaleMultiplier: displayText.singleLineScaleMultiplier
+                ),
+                weight: fontWeight,
+                numbersOnlyLarge: displayText.singleLineNumbersOnlyLarge
+            )
+            .foregroundStyle(textColor)
             .multilineTextAlignment(multilineAlignment)
+        } else {
+            let highlightedIndex = highlightedMultiLineIndex(lineCount: renderedLines.count)
+
+            multilineStack(lineSpacing: metrics.lineSpacing * 0.6) { index, line, lineCount in
+                lineView(
+                    line: line,
+                    index: index,
+                    lineCount: lineCount,
+                    weight: index == highlightedIndex ? .heavy : .medium,
+                    useEmphasizedResolver: index == highlightedIndex,
+                    uppercase: index == 0
+                )
+                .foregroundStyle(index == highlightedIndex ? textColor : textColor.opacity(0.9))
+            }
+        }
+    }
+
+    // MARK: - Shared Builders
+
+    private func multilineStack<LineContent: View>(
+        lineSpacing: CGFloat,
+        shadowColor: Color? = nil,
+        shadowRadius: CGFloat = 0,
+        @ViewBuilder lineContent: @escaping (_ index: Int, _ line: EditorOverlayLine, _ lineCount: Int) -> LineContent
+    ) -> some View {
+        let lineCount = renderedLines.count
+
+        return VStack(alignment: horizontalAlignment, spacing: lineSpacing) {
+            ForEach(Array(renderedLines.enumerated()), id: \.element.id) { index, line in
+                lineContent(index, line, lineCount)
+            }
+        }
+        .multilineTextAlignment(multilineAlignment)
+        .shadow(
+            color: shadowColor?.opacity(1) ?? .clear,
+            radius: shadowRadius,
+            x: 0,
+            y: shadowColor == nil ? 0 : 1
+        )
+    }
+
+    private func lineView(
+        line: EditorOverlayLine,
+        index: Int,
+        lineCount: Int,
+        weight: Font.Weight,
+        useEmphasizedResolver: Bool = false,
+        uppercase: Bool = false
+    ) -> some View {
+        let fontSize = EditorTextLayout.multiLineFontSize(
+            metrics: metrics,
+            designTemplate: designTemplate,
+            lineIndex: index,
+            lineCount: lineCount,
+            scaleMultiplier: line.scaleMultiplier
+        )
+
+        return styledText(
+            text: line.text,
+            fontSize: fontSize,
+            weight: weight,
+            isEmphasized: useEmphasizedResolver,
+            numbersOnlyLarge: line.numbersOnlyLarge
+        )
+        .textCase(uppercase ? .uppercase : nil)
+    }
+
+    private func styledText(
+        text: String,
+        fontSize: CGFloat,
+        weight: Font.Weight,
+        isEmphasized: Bool = false,
+        numbersOnlyLarge: Bool = false
+    ) -> Text {
+        let baseFont = overlayFont(size: fontSize, weight: weight, text: text, isEmphasized: isEmphasized)
+        let baseTracking = overlayTracking(size: fontSize, text: text, isEmphasized: isEmphasized)
+
+        guard numbersOnlyLarge else {
+            return Text(text)
+                .font(baseFont)
+                .tracking(baseTracking)
+        }
+
+        let emphasizedSize = EditorTextLayout.emphasizedDigitFontSize(baseFontSize: fontSize)
+        let emphasizedWeight = heavierWeight(than: weight)
+        let emphasizedFont = overlayFont(
+            size: emphasizedSize,
+            weight: emphasizedWeight,
+            text: text,
+            isEmphasized: true
+        )
+        let emphasizedTracking = overlayTracking(size: emphasizedSize, text: text, isEmphasized: true)
+        let segments = textSegments(for: text)
+
+        return segments.reduce(Text("")) { partial, segment in
+            partial + Text(segment.text)
+                .font(segment.isNumber ? emphasizedFont : baseFont)
+                .tracking(segment.isNumber ? emphasizedTracking : baseTracking)
+        }
+    }
+
+    private func highlightedMultiLineIndex(lineCount: Int) -> Int? {
+        guard designTemplate.numberEmphasis, lineCount > 1 else { return nil }
+        return min(1, lineCount - 1)
+    }
+
+    private func textSegments(for text: String) -> [(text: String, isNumber: Bool)] {
+        guard let regex = try? NSRegularExpression(pattern: "[0-9０-９]+") else {
+            return [(text, false)]
+        }
+
+        let nsRange = NSRange(text.startIndex..<text.endIndex, in: text)
+        let matches = regex.matches(in: text, range: nsRange)
+        guard !matches.isEmpty else { return [(text, false)] }
+
+        var segments: [(text: String, isNumber: Bool)] = []
+        var currentIndex = text.startIndex
+
+        for match in matches {
+            guard let range = Range(match.range, in: text) else { continue }
+
+            if currentIndex < range.lowerBound {
+                segments.append((String(text[currentIndex..<range.lowerBound]), false))
+            }
+
+            segments.append((String(text[range]), true))
+            currentIndex = range.upperBound
+        }
+
+        if currentIndex < text.endIndex {
+            segments.append((String(text[currentIndex..<text.endIndex]), false))
+        }
+
+        return segments
+    }
+
+    private func heavierWeight(than weight: Font.Weight) -> Font.Weight {
+        switch weight {
+        case .thin:
+            return .light
+        case .light:
+            return .regular
+        case .regular:
+            return .semibold
+        case .medium:
+            return .semibold
+        case .semibold:
+            return .bold
+        case .bold:
+            return .heavy
+        case .heavy:
+            return .heavy
+        default:
+            return .bold
         }
     }
 
     // MARK: - Background Band
 
     private var backgroundBand: some View {
-        RoundedRectangle(cornerRadius: 6 * scale, style: .continuous)
+        RoundedRectangle(cornerRadius: metrics.cornerRadius, style: .continuous)
             .fill(bandColor)
     }
 }
@@ -223,29 +418,47 @@ struct TextOverlayView: View {
         Color.gray
         TextOverlayView(
             designTemplate: DesignTemplateStore.template(for: .minimal),
+            fontPreset: .standard,
             layoutMode: .single,
-            line1: "",
-            line2: "",
-            singleLine: "誕生日まで あと30日",
+            displayText: EditorDisplayText(
+                singleLine: "誕生日まで あと30日",
+                singleLineScaleMultiplier: 1.0,
+                singleLineNumbersOnlyLarge: true,
+                multiLines: []
+            ),
+            canvasSize: CGSize(width: 400, height: 600),
             scale: 1.0,
+            textAlignment: .center,
             colorOverride: nil,
-            showBackground: false
+            showBackground: false,
+            backgroundColorHex: "#2C2C2ECC"
         )
     }
 }
 
-#Preview("Poster Double") {
+#Preview("Milestone Multi") {
     ZStack {
         Color.gray
         TextOverlayView(
-            designTemplate: DesignTemplateStore.template(for: .poster),
+            designTemplate: DesignTemplateStore.template(for: .milestone),
+            fontPreset: .editorialSerif,
             layoutMode: .double,
-            line1: "誕生日",
-            line2: "あと30日",
-            singleLine: "",
+            displayText: EditorDisplayText(
+                singleLine: "",
+                singleLineScaleMultiplier: 1.0,
+                singleLineNumbersOnlyLarge: false,
+                multiLines: [
+                    EditorOverlayLine(id: 0, text: "禁煙", scaleMultiplier: 1.0, numbersOnlyLarge: false),
+                    EditorOverlayLine(id: 1, text: "30日", scaleMultiplier: 1.24, numbersOnlyLarge: true),
+                    EditorOverlayLine(id: 2, text: "継続中", scaleMultiplier: 1.0, numbersOnlyLarge: false),
+                ]
+            ),
+            canvasSize: CGSize(width: 400, height: 600),
             scale: 1.0,
+            textAlignment: .center,
             colorOverride: nil,
-            showBackground: true
+            showBackground: true,
+            backgroundColorHex: "#000000AA"
         )
     }
 }

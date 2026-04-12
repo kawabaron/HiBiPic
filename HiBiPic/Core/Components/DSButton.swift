@@ -84,7 +84,7 @@ struct DSButton: View {
                     icon
                         .font(.system(size: 16, weight: .medium))
                 }
-                Text(title)
+                Text(L10n.t(title))
                     .font(DSTypography.headline)
             }
         }

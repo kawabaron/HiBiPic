@@ -31,9 +31,6 @@ struct EventCreateScreen: View {
                     eventNameSection
                     baseDateSection
                     countTypeSection
-                    phraseTemplateSection
-                    designTemplateSection
-                    previewSection
                     pinToggleSection
 
                     // Bottom padding for sticky bar clearance
@@ -54,7 +51,7 @@ struct EventCreateScreen: View {
                 cancelButton
             }
             ToolbarItem(placement: .principal) {
-                Text(viewModel.isEditing ? "イベントを編集" : "イベントを作成")
+                Text(viewModel.isEditing ? L10n.t("イベントを編集") : L10n.t("イベントを作成"))
                     .font(DSTypography.headline)
                     .foregroundStyle(DSColors.textPrimary)
             }
@@ -64,14 +61,14 @@ struct EventCreateScreen: View {
             viewModel.initialize(event: editingEvent)
         }
         .confirmationDialog(
-            "変更を破棄しますか？",
+            L10n.t("変更を破棄しますか？"),
             isPresented: $viewModel.showCancelConfirm,
             titleVisibility: .visible
         ) {
-            Button("破棄", role: .destructive) {
+            Button(L10n.t("破棄"), role: .destructive) {
                 dismiss()
             }
-            Button("編集を続ける", role: .cancel) {}
+            Button(L10n.t("編集を続ける"), role: .cancel) {}
         }
         .dsToast($viewModel.toast)
     }
@@ -86,7 +83,7 @@ struct EventCreateScreen: View {
                 dismiss()
             }
         } label: {
-            Text("キャンセル")
+            Text(L10n.t("キャンセル"))
                 .font(DSTypography.body)
                 .foregroundStyle(DSColors.textSecondary)
         }
@@ -96,9 +93,9 @@ struct EventCreateScreen: View {
 
     private var eventNameSection: some View {
         DSTextField(
-            "イベント名",
+            L10n.t("イベント名"),
             text: $viewModel.eventName,
-            placeholder: "結婚式、出産予定日、禁煙開始...",
+            placeholder: L10n.t("結婚式、出産予定日、禁煙開始..."),
             maxLength: 50,
             error: viewModel.eventNameError
         )
@@ -108,7 +105,7 @@ struct EventCreateScreen: View {
 
     private var baseDateSection: some View {
         VStack(alignment: .leading, spacing: DSSpacing.xs) {
-            Text("基準日")
+            Text(L10n.t("基準日"))
                 .font(DSTypography.footnote)
                 .foregroundStyle(DSColors.textSecondary)
 
@@ -135,7 +132,7 @@ struct EventCreateScreen: View {
 
     private var countTypeSection: some View {
         VStack(alignment: .leading, spacing: DSSpacing.xs) {
-            Text("カウント方法")
+            Text(L10n.t("カウント方法"))
                 .font(DSTypography.footnote)
                 .foregroundStyle(DSColors.textSecondary)
 
@@ -147,69 +144,13 @@ struct EventCreateScreen: View {
                 ),
                 label: { type in
                     switch type {
-                    case .countdown: return "あと何日"
-                    case .elapsed:   return "何日経過"
-                    case .daycount:  return "何日目"
+                    case .countdown: return L10n.t("あと何日")
+                    case .elapsed:   return L10n.t("何日経過")
+                    case .daycount:  return L10n.t("何日目")
                     }
                 }
             )
         }
-    }
-
-    // MARK: - Phrase Template Section
-
-    private var phraseTemplateSection: some View {
-        VStack(alignment: .leading, spacing: DSSpacing.md) {
-            PhraseTemplatePicker(
-                templates: viewModel.availablePhraseTemplates,
-                selectedTemplateId: viewModel.phraseTemplateId,
-                isCustomMode: viewModel.customPhraseMode,
-                eventName: viewModel.eventName,
-                dayCount: viewModel.currentDayCount,
-                onSelect: { template in
-                    viewModel.selectPhraseTemplate(template)
-                },
-                onCustomTap: {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        viewModel.customPhraseMode = true
-                    }
-                }
-            )
-
-            // Custom phrase editor (shown when custom mode is active)
-            if viewModel.customPhraseMode {
-                CustomPhraseEditor(
-                    layoutMode: $viewModel.layoutMode,
-                    customSingleLine: $viewModel.customSingleLine,
-                    customLine1: $viewModel.customLine1,
-                    customLine2: $viewModel.customLine2,
-                    eventName: viewModel.eventName,
-                    dayCount: viewModel.currentDayCount
-                )
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-    }
-
-    // MARK: - Design Template Section
-
-    private var designTemplateSection: some View {
-        DesignTemplatePicker(
-            selectedType: viewModel.designTemplateId,
-            onSelect: { type in
-                viewModel.updateDesignTemplate(type)
-            }
-        )
-    }
-
-    // MARK: - Preview Section
-
-    private var previewSection: some View {
-        EventPreviewSection(
-            previewText: viewModel.previewText,
-            designTemplateType: viewModel.designTemplateId,
-            layoutMode: viewModel.layoutMode
-        )
     }
 
     // MARK: - Pin Toggle Section
@@ -217,11 +158,11 @@ struct EventCreateScreen: View {
     private var pinToggleSection: some View {
         HStack {
             VStack(alignment: .leading, spacing: DSSpacing.xxs) {
-                Text("ピン留め")
+                Text(L10n.t("ピン留め"))
                     .font(DSTypography.body)
                     .foregroundStyle(DSColors.textPrimary)
 
-                Text("ホーム画面の上部に固定されます")
+                Text(L10n.t("ホーム画面の上部に固定されます"))
                     .font(DSTypography.caption)
                     .foregroundStyle(DSColors.textTertiary)
             }
@@ -249,7 +190,7 @@ struct EventCreateScreen: View {
                 .foregroundStyle(DSColors.divider)
 
             DSButton(
-                viewModel.isEditing ? "保存する" : "保存して使う",
+                viewModel.isEditing ? L10n.t("保存する") : L10n.t("保存して使う"),
                 style: .primary,
                 isLoading: $viewModel.isSaving
             ) {
@@ -268,6 +209,7 @@ struct EventCreateScreen: View {
         }
         .background(.ultraThinMaterial)
     }
+
 }
 
 // MARK: - Preview

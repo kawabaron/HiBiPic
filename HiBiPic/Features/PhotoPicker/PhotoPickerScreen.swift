@@ -1,132 +1,99 @@
 import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 
 // MARK: - PhotoPickerScreen
 
-/// A lightweight wrapper around the native `PhotosPicker` that loads the
-/// selected image and forwards it to the caller.
-struct PhotoPickerScreen: View {
+/// Wraps the native photo picker so the first presentation is reliable and
+/// returns the chosen image directly to the editor flow.
+struct PhotoPickerScreen: UIViewControllerRepresentable {
 
-    // MARK: - Properties
-
-    let event: Event
-    @Binding var selectedImage: UIImage?
     @Binding var isPresented: Bool
     var onImageSelected: (UIImage) -> Void
 
-    @State private var selectedItem: PhotosPickerItem?
-    @State private var isLoading = false
-
-    // MARK: - Body
-
-    var body: some View {
-        PhotosPicker(
-            selection: $selectedItem,
-            matching: .images,
-            photoLibrary: .shared()
-        ) {
-            pickerLabel
-        }
-        .photosPickerStyle(.inline)
-        .photosPickerDisabledCapabilities(.selectionActions)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
-        .overlay(alignment: .top) {
-            headerBar
-        }
-        .overlay {
-            if isLoading {
-                loadingOverlay
-            }
-        }
-        .onChange(of: selectedItem) { _, newItem in
-            guard let newItem else { return }
-            loadImage(from: newItem)
-        }
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
     }
 
-    // MARK: - Header Bar
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        configuration.filter = .images
+        configuration.selectionLimit = 1
+        configuration.preferredAssetRepresentationMode = .current
 
-    private var headerBar: some View {
-        HStack {
-            Button {
-                isPresented = false
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = context.coordinator
+        picker.view.backgroundColor = .black
+        return picker
+    }
 
-            Spacer()
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
 
-            Text(event.name)
-                .font(DSTypography.headline)
-                .foregroundStyle(.white)
+    // MARK: - Coordinator
 
-            Spacer()
+    final class Coordinator: NSObject, PHPickerViewControllerDelegate {
+        private let parent: PhotoPickerScreen
 
-            // Invisible spacer to balance the close button
-            Color.clear
-                .frame(width: 36, height: 36)
+        init(_ parent: PhotoPickerScreen) {
+            self.parent = parent
         }
-        .padding(.horizontal, DSSpacing.lg)
-        .padding(.top, DSSpacing.sm)
-        .padding(.bottom, DSSpacing.sm)
-        .background(
-            LinearGradient(
-                colors: [.black.opacity(0.6), .clear],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-    }
 
-    // MARK: - Picker Label
-
-    private var pickerLabel: some View {
-        VStack(spacing: DSSpacing.md) {
-            Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 40))
-                .foregroundStyle(.white.opacity(0.7))
-
-            Text("写真を選択")
-                .font(DSTypography.headline)
-                .foregroundStyle(.white.opacity(0.8))
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    // MARK: - Loading Overlay
-
-    private var loadingOverlay: some View {
-        Color.black.opacity(0.5)
-            .ignoresSafeArea()
-            .overlay {
-                ProgressView()
-                    .tint(.white)
-                    .scaleEffect(1.2)
-            }
-    }
-
-    // MARK: - Image Loading
-
-    private func loadImage(from item: PhotosPickerItem) {
-        isLoading = true
-
-        Task {
-            defer { isLoading = false }
-
-            guard let data = try? await item.loadTransferable(type: Data.self),
-                  let image = UIImage(data: data)
-            else {
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            guard let provider = results.first?.itemProvider else {
+                DispatchQueue.main.async {
+                    self.parent.isPresented = false
+                }
                 return
             }
 
-            selectedImage = image
-            onImageSelected(image)
-            isPresented = false
+            loadPickedImage(from: provider)
+        }
+
+        private func loadPickedImage(from provider: NSItemProvider) {
+            if let imageTypeIdentifier = provider.registeredTypeIdentifiers.first(where: {
+                UTType($0)?.conforms(to: .image) == true
+            }) {
+                provider.loadDataRepresentation(forTypeIdentifier: imageTypeIdentifier) { data, _ in
+                    if let data,
+                       let image = UIImage(data: data)
+                    {
+                        DispatchQueue.main.async {
+                            self.finishPicking(with: image)
+                        }
+                        return
+                    }
+
+                    self.loadUIImageObject(from: provider)
+                }
+                return
+            }
+
+            loadUIImageObject(from: provider)
+        }
+
+        private func loadUIImageObject(from provider: NSItemProvider) {
+            guard provider.canLoadObject(ofClass: UIImage.self) else {
+                DispatchQueue.main.async {
+                    self.parent.isPresented = false
+                }
+                return
+            }
+
+            provider.loadObject(ofClass: UIImage.self) { image, _ in
+                DispatchQueue.main.async {
+                    guard let image = image as? UIImage else {
+                        self.parent.isPresented = false
+                        return
+                    }
+
+                    self.finishPicking(with: image)
+                }
+            }
+        }
+
+        private func finishPicking(with image: UIImage) {
+            parent.onImageSelected(image)
+            parent.isPresented = false
         }
     }
 }

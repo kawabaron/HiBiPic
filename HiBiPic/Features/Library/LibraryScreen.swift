@@ -4,6 +4,7 @@ import SwiftUI
 
 extension Notification.Name {
     static let libraryDidChange = Notification.Name("libraryDidChange")
+    static let eventListDidChange = Notification.Name("eventListDidChange")
 }
 
 // MARK: - LibraryScreen
@@ -17,23 +18,26 @@ struct LibraryScreen: View {
     @State var viewModel: LibraryViewModel
     @State private var viewModeIndex = 0
     @State private var selectedImage: SavedImage?
-    @State private var showImageDetail = false
 
     /// Callback for "カメラで撮る" (filtered mode only).
     var onCaptureForEvent: ((Event) -> Void)?
     /// Callback for "写真から選ぶ" (filtered mode only).
     var onPickPhotoForEvent: ((Event) -> Void)?
+    /// Opens the app settings (root library only).
+    var onSettingsTap: (() -> Void)?
 
     // MARK: - Init
 
     init(
         eventId: String? = nil,
         onCaptureForEvent: ((Event) -> Void)? = nil,
-        onPickPhotoForEvent: ((Event) -> Void)? = nil
+        onPickPhotoForEvent: ((Event) -> Void)? = nil,
+        onSettingsTap: (() -> Void)? = nil
     ) {
         self._viewModel = State(initialValue: LibraryViewModel(eventId: eventId))
         self.onCaptureForEvent = onCaptureForEvent
         self.onPickPhotoForEvent = onPickPhotoForEvent
+        self.onSettingsTap = onSettingsTap
     }
 
     // MARK: - Body
@@ -47,18 +51,28 @@ struct LibraryScreen: View {
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            if viewModel.filteredEvent == nil, let onSettingsTap {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: onSettingsTap) {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(DSColors.accent)
+                    }
+                }
+            }
+
             if let event = viewModel.filteredEvent, let onCapture = onCaptureForEvent {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
                             onCapture(event)
                         } label: {
-                            Label("カメラで撮る", systemImage: "camera.fill")
+                            Label(L10n.t("カメラで撮る"), systemImage: "camera.fill")
                         }
                         Button {
                             onPickPhotoForEvent?(event)
                         } label: {
-                            Label("写真から選ぶ", systemImage: "photo.on.rectangle")
+                            Label(L10n.t("写真から選ぶ"), systemImage: "photo.on.rectangle")
                         }
                     } label: {
                         Image(systemName: "camera.fill")
@@ -69,17 +83,21 @@ struct LibraryScreen: View {
             }
         }
         .onAppear {
+            syncViewModeIndex()
             viewModel.loadImages()
         }
         .onReceive(NotificationCenter.default.publisher(for: .libraryDidChange)) { _ in
             viewModel.loadImages()
         }
-        .fullScreenCover(isPresented: $showImageDetail) {
-            if let image = selectedImage {
-                ImageDetailView(image: image) {
-                    viewModel.deleteImage(image)
-                    selectedImage = nil
+        .fullScreenCover(item: $selectedImage) { image in
+            ImageDetailView(
+                images: viewModel.images,
+                initialImageID: image.id,
+                onPrepareReedit: { selectedImage in
+                    viewModel.prepareEditor(for: selectedImage)
                 }
+            ) { deletedImage in
+                viewModel.deleteImage(deletedImage)
             }
         }
     }
@@ -88,13 +106,13 @@ struct LibraryScreen: View {
 
     private var segmentControl: some View {
         DSSegmentedControl(
-            items: [LibraryViewMode.grid.displayLabel, LibraryViewMode.calendar.displayLabel],
+            items: [LibraryViewMode.calendar.displayLabel, LibraryViewMode.grid.displayLabel],
             selection: $viewModeIndex
         )
         .padding(.horizontal, DSSpacing.lg)
         .padding(.vertical, DSSpacing.sm)
         .onChange(of: viewModeIndex) { _, newValue in
-            viewModel.viewMode = newValue == 0 ? .grid : .calendar
+            viewModel.viewMode = newValue == 0 ? .calendar : .grid
         }
     }
 
@@ -106,12 +124,10 @@ struct LibraryScreen: View {
         case .grid:
             LibraryGridView(images: viewModel.images) { image in
                 selectedImage = image
-                showImageDetail = true
             }
         case .calendar:
             LibraryCalendarView(viewModel: viewModel) { image in
                 selectedImage = image
-                showImageDetail = true
             }
         }
     }
@@ -122,6 +138,10 @@ struct LibraryScreen: View {
         if let event = viewModel.filteredEvent {
             return event.name
         }
-        return "ライブラリ"
+        return L10n.t("ライブラリ")
+    }
+
+    private func syncViewModeIndex() {
+        viewModeIndex = viewModel.viewMode == .calendar ? 0 : 1
     }
 }

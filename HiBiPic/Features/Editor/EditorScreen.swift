@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - EditorScreen
 
@@ -8,78 +9,73 @@ struct EditorScreen: View {
 
     // MARK: - Properties
 
-    @Bindable var viewModel: EditorViewModel
+    @State private var viewModel: EditorViewModel
 
     /// Dismiss action for the close button.
     @Environment(\.dismiss) private var dismiss
 
-    /// Tracks the photo area size for normalising drag coordinates.
-    @State private var photoAreaSize: CGSize = .zero
-
-    /// Accumulated drag offset for smoother gesture handling.
-    @State private var dragOffset: CGSize = .zero
+    init(viewModel: EditorViewModel) {
+        _viewModel = State(initialValue: viewModel)
+    }
 
     // MARK: - Body
 
     var body: some View {
+        @Bindable var bindableViewModel = viewModel
+
         ZStack {
-            // Full-screen dark background
-            Color.black.ignoresSafeArea()
+            editorBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Top navigation bar
                 topBar
-
-                // Photo area with text overlay
                 photoArea
-                    .layoutPriority(1)
-
-                // Bottom toolbar
-                bottomToolbar
-
-                // Expandable tool panel
-                EditorToolPanel(viewModel: viewModel)
-                    .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.activeEditTool)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                bottomControls
             }
         }
         .overlay {
-            if viewModel.showSaveSuccess {
-                SaveSuccessView(
-                    onSaveToPhotos: {
-                        Task {
-                            await viewModel.saveRenderedToPhotoLibrary()
+            ZStack {
+                if viewModel.isSaving {
+                    savingOverlay
+                }
+
+                if viewModel.showSaveSuccess {
+                    SaveSuccessView(
+                        onSaveToPhotos: {
+                            Task {
+                                await viewModel.saveRenderedToPhotoLibrary()
+                            }
+                        },
+                        onShare: {
+                            viewModel.showSaveSuccess = false
+                            viewModel.showShareSheet = true
+                        },
+                        onBackToLibrary: {
+                            viewModel.showSaveSuccess = false
+                            dismiss()
                         }
-                    },
-                    onShare: {
-                        viewModel.showSaveSuccess = false
-                        viewModel.showShareSheet = true
-                    },
-                    onBackToLibrary: {
-                        viewModel.showSaveSuccess = false
-                        dismiss()
-                    }
-                )
-                .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                .animation(.easeOut(duration: 0.3), value: viewModel.showSaveSuccess)
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .animation(.easeOut(duration: 0.3), value: viewModel.showSaveSuccess)
+                }
             }
         }
-        .sheet(isPresented: $viewModel.showShareSheet) {
+        .sheet(isPresented: $bindableViewModel.showShareSheet) {
             ShareSheetView(image: viewModel.shareImage())
         }
         .alert(
-            "エラー",
+            L10n.t("エラー"),
             isPresented: Binding(
                 get: { viewModel.saveErrorMessage != nil },
                 set: { if !$0 { viewModel.saveErrorMessage = nil } }
             )
         ) {
-            Button("OK", role: .cancel) {}
+            Button(L10n.t("OK"), role: .cancel) {}
         } message: {
             if let msg = viewModel.saveErrorMessage {
                 Text(msg)
             }
         }
-        .statusBarHidden()
     }
 
     // MARK: - Top Bar
@@ -90,18 +86,12 @@ struct EditorScreen: View {
             Button {
                 dismiss()
             } label: {
-                Text("閉じる")
-                    .font(DSTypography.callout)
-                    .foregroundStyle(.white)
+                Text(L10n.t("キャンセル"))
+                    .font(.system(size: 17))
+                    .foregroundStyle(DSColors.accent)
+                    .frame(minWidth: 44, alignment: .leading)
             }
-
-            Spacer()
-
-            // Event name
-            Text(viewModel.event.name)
-                .font(DSTypography.headline)
-                .foregroundStyle(.white)
-                .lineLimit(1)
+            .buttonStyle(.plain)
 
             Spacer()
 
@@ -113,99 +103,69 @@ struct EditorScreen: View {
             } label: {
                 if viewModel.isSaving {
                     ProgressView()
-                        .tint(.white)
+                        .tint(DSColors.accent)
                         .controlSize(.small)
-                        .frame(width: 60)
+                        .frame(minWidth: 44, alignment: .trailing)
                 } else {
-                    Text("保存")
-                        .font(DSTypography.headline)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, DSSpacing.md)
-                        .padding(.vertical, DSSpacing.xs)
-                        .background(
-                            Capsule()
-                                .fill(DSColors.accent)
-                        )
+                    Text(L10n.t("保存"))
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(DSColors.accent)
+                        .frame(minWidth: 44, alignment: .trailing)
                 }
             }
+            .buttonStyle(.plain)
             .disabled(viewModel.isSaving)
         }
         .padding(.horizontal, DSSpacing.lg)
-        .padding(.vertical, DSSpacing.md)
-        .background(
-            Color.black.opacity(0.3)
-                .background(.ultraThinMaterial.opacity(0.5))
-        )
+        .frame(height: 48)
+        .background(editorChromeFill)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(DSColors.divider)
+                .frame(height: 1)
+        }
     }
 
     // MARK: - Photo Area
 
     private var photoArea: some View {
         GeometryReader { geo in
-            let imageAspect = viewModel.image.size.width / max(viewModel.image.size.height, 1)
-            let areaAspect = geo.size.width / max(geo.size.height, 1)
-
-            let displaySize: CGSize = {
-                if imageAspect > areaAspect {
-                    // Image is wider - fit to width
-                    let w = geo.size.width
-                    let h = w / imageAspect
-                    return CGSize(width: w, height: h)
-                } else {
-                    // Image is taller - fit to height
-                    let h = geo.size.height
-                    let w = h * imageAspect
-                    return CGSize(width: w, height: h)
-                }
-            }()
-
-            let imageOrigin = CGPoint(
-                x: (geo.size.width - displaySize.width) / 2,
-                y: (geo.size.height - displaySize.height) / 2
-            )
+            let previewLayout = EditorImageGeometry(image: viewModel.image)
+                .previewLayout(in: geo.size)
 
             ZStack {
                 // Photo
                 Image(uiImage: viewModel.image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: displaySize.width, height: displaySize.height)
+                    .frame(width: previewLayout.displaySize.width, height: previewLayout.displaySize.height)
                     .clipped()
 
                 // Draggable text overlay
-                textOverlay(imageSize: displaySize)
+                textOverlay(imageSize: previewLayout.displaySize)
                     .position(
-                        x: viewModel.textPosition.x * displaySize.width,
-                        y: viewModel.textPosition.y * displaySize.height
+                        x: viewModel.textPosition.x * previewLayout.displaySize.width,
+                        y: viewModel.textPosition.y * previewLayout.displaySize.height
                     )
                     .gesture(
                         DragGesture()
                             .onChanged { value in
-                                let newX = value.location.x / displaySize.width
-                                let newY = value.location.y / displaySize.height
-                                viewModel.textPosition = CGPoint(
-                                    x: clamp(newX, min: 0.05, max: 0.95),
-                                    y: clamp(newY, min: 0.05, max: 0.95)
+                                let newX = value.location.x / previewLayout.displaySize.width
+                                let newY = value.location.y / previewLayout.displaySize.height
+                                viewModel.updateTextPositionManually(
+                                    CGPoint(
+                                        x: clamp(newX, min: 0.05, max: 0.95),
+                                        y: clamp(newY, min: 0.05, max: 0.95)
+                                    )
                                 )
                             }
                     )
             }
-            .frame(width: displaySize.width, height: displaySize.height)
-            .position(
-                x: imageOrigin.x + displaySize.width / 2,
-                y: imageOrigin.y + displaySize.height / 2
-            )
-            .onAppear {
-                photoAreaSize = displaySize
-            }
+            .frame(width: previewLayout.displaySize.width, height: previewLayout.displaySize.height)
+            .position(x: previewLayout.displayRect.midX, y: previewLayout.displayRect.midY)
         }
+        .background(editorBackground)
         .contentShape(Rectangle())
-        .onTapGesture {
-            // Dismiss tool panel when tapping the photo area
-            withAnimation(.easeInOut(duration: 0.2)) {
-                viewModel.activeEditTool = .none
-            }
-        }
     }
 
     // MARK: - Text Overlay
@@ -215,30 +175,82 @@ struct EditorScreen: View {
 
         return TextOverlayView(
             designTemplate: viewModel.currentDesignTemplate,
+            fontPreset: viewModel.fontPreset,
             layoutMode: viewModel.layoutMode,
-            line1: text.line1,
-            line2: text.line2,
-            singleLine: text.singleLine,
+            displayText: text,
+            canvasSize: imageSize,
             scale: viewModel.textScale,
+            textAlignment: viewModel.effectiveTextAlignment,
             colorOverride: viewModel.textColorOverride,
-            showBackground: viewModel.showBackgroundBand
+            showBackground: viewModel.showBackgroundBand,
+            backgroundColorHex: viewModel.effectiveBackgroundBandColorHex
         )
+    }
+
+    private var savingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.2)
+                .ignoresSafeArea()
+
+            VStack(spacing: DSSpacing.md) {
+                ProgressView()
+                    .controlSize(.large)
+                    .tint(DSColors.accent)
+
+                Text(L10n.t("保存中..."))
+                    .font(DSTypography.headline)
+                    .foregroundStyle(DSColors.textPrimary)
+
+                Text(L10n.t("画像を書き出しています"))
+                    .font(DSTypography.caption)
+                    .foregroundStyle(DSColors.textSecondary)
+            }
+            .padding(.horizontal, DSSpacing.xxl)
+            .padding(.vertical, DSSpacing.xl)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerLg, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: DSSpacing.cornerLg, style: .continuous)
+                    .strokeBorder(DSColors.border, lineWidth: 1)
+            }
+            .dsShadow(.card)
+        }
+        .transition(.opacity)
+    }
+
+    // MARK: - Bottom Controls
+
+    private var bottomControls: some View {
+        VStack(spacing: DSSpacing.sm) {
+            EditorToolPanel(viewModel: viewModel)
+                .animation(.spring(response: 0.35, dampingFraction: 0.85), value: viewModel.activeEditTool)
+
+            bottomToolbar
+        }
+        .padding(.horizontal, DSSpacing.sm)
+        .padding(.top, DSSpacing.sm)
+        .padding(.bottom, DSSpacing.sm)
+        .background(editorChromeFill)
     }
 
     // MARK: - Bottom Toolbar
 
     private var bottomToolbar: some View {
         HStack(spacing: 0) {
-            ForEach(EditorViewModel.EditTool.allCases.filter { $0 != .none }) { tool in
+            ForEach(toolbarTools) { tool in
                 toolButton(tool)
             }
         }
-        .padding(.horizontal, DSSpacing.sm)
+        .frame(height: 52)
+        .padding(.horizontal, DSSpacing.xs)
         .padding(.vertical, DSSpacing.sm)
-        .background(
-            Color.black.opacity(0.3)
-                .background(.ultraThinMaterial.opacity(0.5))
-        )
+        .background(DSColors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DSSpacing.cornerLg, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: DSSpacing.cornerLg, style: .continuous)
+                .strokeBorder(DSColors.border, lineWidth: 1)
+        }
+        .dsShadow(.soft)
     }
 
     private func toolButton(_ tool: EditorViewModel.EditTool) -> some View {
@@ -252,14 +264,20 @@ struct EditorScreen: View {
             VStack(spacing: DSSpacing.xxs) {
                 Image(systemName: tool.systemImage)
                     .font(.system(size: 20))
-                    .foregroundStyle(isActive ? DSColors.accent : Color.white.opacity(0.7))
+                    .foregroundStyle(isActive ? DSColors.accent : DSColors.textSecondary)
 
                 Text(tool.label)
                     .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(isActive ? DSColors.accent : Color.white.opacity(0.5))
+                    .foregroundStyle(isActive ? DSColors.accent : DSColors.textTertiary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, DSSpacing.xs)
+            .background(
+                RoundedRectangle(cornerRadius: DSSpacing.cornerMd, style: .continuous)
+                    .fill(isActive ? DSColors.accentLight.opacity(0.22) : Color.clear)
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -267,8 +285,24 @@ struct EditorScreen: View {
 
     // MARK: - Helpers
 
+    private var toolbarTools: [EditorViewModel.EditTool] {
+        [.template, .font, .phrase, .position, .textSize, .textColor, .background]
+    }
+
     private func clamp(_ value: CGFloat, min minVal: CGFloat, max maxVal: CGFloat) -> CGFloat {
         Swift.min(maxVal, Swift.max(minVal, value))
+    }
+
+    private var editorChromeFill: Color {
+        DSColors.background
+    }
+
+    private var editorBackground: LinearGradient {
+        LinearGradient(
+            colors: [DSColors.background, DSColors.secondaryBackground],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 }
 
