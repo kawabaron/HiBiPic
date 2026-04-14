@@ -6,6 +6,9 @@ Copyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee
 Great Vibes Regular
 Copyright 2015 The Great Vibes Pro Project Authors (https://github.com/googlefonts/great-vibes)
 
+LXGW WenKai Lite Regular
+Copyright 2021-2022 The LXGW WenKai Lite Project Authors (https://github.com/lxgw/LxgwWenKai-Lite)
+
 These fonts are licensed under the SIL Open Font License, Version 1.1.
 
 -----------------------------------------------------------

@@ -81,14 +81,7 @@ private extension Bundle {
     static func setAppLanguage(_ languageIdentifier: String) {
         object_setClass(Bundle.main, AppLanguageBundle.self)
 
-        let resourceIdentifier: String
-        switch languageIdentifier {
-        case AppLanguage.englishGB.rawValue:
-            resourceIdentifier = AppLanguage.englishUS.rawValue
-        default:
-            resourceIdentifier = languageIdentifier
-        }
-
+        let resourceIdentifier = languageIdentifier
         let preferredPath = Bundle.main.path(forResource: resourceIdentifier, ofType: "lproj")
         let languageCode = Locale(identifier: resourceIdentifier).language.languageCode?.identifier
         let fallbackPath = languageCode.flatMap {

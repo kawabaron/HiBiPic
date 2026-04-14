@@ -94,7 +94,7 @@ struct SettingsScreen: View {
             VStack(alignment: .leading, spacing: DSSpacing.lg) {
                 sectionHeader(
                     title: "言語",
-                    description: "日付などの地域表記と、今後追加する翻訳表示に使う言語を選べます。",
+                    description: "日付などの地域表記と、アプリ内表示に使う言語を選べます。",
                     systemImage: "globe"
                 )
 

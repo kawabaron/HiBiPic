@@ -5,7 +5,7 @@
 "サポート" = "Support";
 "利用規約やプライバシー情報の確認、お問い合わせはこちらから開けます。" = "Open the terms, privacy policy, and contact links here.";
 "言語" = "Language";
-"日付などの地域表記と、今後追加する翻訳表示に使う言語を選べます。" = "Choose the language used for regional date formatting and translated app text.";
+"日付などの地域表記と、アプリ内表示に使う言語を選べます。" = "Choose the language used for regional date formatting and app text.";
 "一部のリンク先はまだ設定されていないため、準備でき次第そのまま差し替えられます。" = "Some links are not configured yet and can be replaced when ready.";
 "リンク先はまだ準備中です" = "Link coming soon";
 "利用規約" = "Terms of Service";
@@ -22,10 +22,9 @@
 "ダーク" = "Dark";
 "日本語" = "Japanese";
 "英語（アメリカ）" = "English (US)";
-"英語（イギリス）" = "English (UK)";
-"ドイツ語" = "German";
-"スペイン語（メキシコ）" = "Spanish (Mexico)";
-"ポルトガル語（ブラジル）" = "Portuguese (Brazil)";
+"韓国語" = "Korean";
+"中国語（簡体字）" = "Chinese (Simplified)";
+"中国語（繁体字）" = "Chinese (Traditional)";
 
 "ライブラリ" = "Library";
 "撮る" = "Capture";

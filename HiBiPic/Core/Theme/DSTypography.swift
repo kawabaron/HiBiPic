@@ -50,9 +50,11 @@ enum OverlayFontResolver {
         isEmphasized: Bool = false
     ) -> Font {
         if preset == .signature {
-            return Font.custom(
-                signatureFontName(text: text, weight: weight, isEmphasized: isEmphasized),
-                size: signatureAdjustedSize(size, text: text, isEmphasized: isEmphasized)
+            return signatureSwiftUIFont(
+                size: size,
+                weight: weight,
+                text: text,
+                isEmphasized: isEmphasized
             )
         }
 
@@ -72,10 +74,12 @@ enum OverlayFontResolver {
         isEmphasized: Bool = false
     ) -> UIFont {
         if preset == .signature {
-            let resolvedSize = signatureAdjustedSize(size, text: text, isEmphasized: isEmphasized)
-            let fontName = signatureFontName(text: text, weight: weight, isEmphasized: isEmphasized)
-            return UIFont(name: fontName, size: resolvedSize)
-                ?? UIFont.systemFont(ofSize: resolvedSize, weight: weight)
+            return signatureUIFont(
+                size: size,
+                weight: weight,
+                text: text,
+                isEmphasized: isEmphasized
+            )
         }
 
         let resolvedSize = adjustedSize(size, preset: preset, isEmphasized: isEmphasized)
@@ -269,13 +273,18 @@ enum OverlayFontResolver {
         weight: Font.Weight,
         isEmphasized: Bool
     ) -> String {
-        if signatureUsesLatinScript(for: text) {
+        switch signatureFontKind(for: text) {
+        case .latin:
             return "GreatVibes-Regular"
+        case .unifiedCJK:
+            return "LXGWWenKaiLite-Regular"
+        case .japanese:
+            return isEmphasized || isKleeSemiBold(weight)
+                ? "KleeOne-SemiBold"
+                : "KleeOne-Regular"
+        case .fallbackSystem:
+            return "KleeOne-Regular"
         }
-
-        return isEmphasized || isKleeSemiBold(weight)
-            ? "KleeOne-SemiBold"
-            : "KleeOne-Regular"
     }
 
     private static func signatureFontName(
@@ -283,13 +292,18 @@ enum OverlayFontResolver {
         weight: UIFont.Weight,
         isEmphasized: Bool
     ) -> String {
-        if signatureUsesLatinScript(for: text) {
+        switch signatureFontKind(for: text) {
+        case .latin:
             return "GreatVibes-Regular"
+        case .unifiedCJK:
+            return "LXGWWenKaiLite-Regular"
+        case .japanese:
+            return isEmphasized || weight.rawValue >= UIFont.Weight.semibold.rawValue
+                ? "KleeOne-SemiBold"
+                : "KleeOne-Regular"
+        case .fallbackSystem:
+            return "KleeOne-Regular"
         }
-
-        return isEmphasized || weight.rawValue >= UIFont.Weight.semibold.rawValue
-            ? "KleeOne-SemiBold"
-            : "KleeOne-Regular"
     }
 
     private static func signatureAdjustedSize(
@@ -297,11 +311,16 @@ enum OverlayFontResolver {
         text: String,
         isEmphasized: Bool
     ) -> CGFloat {
-        if signatureUsesLatinScript(for: text) {
+        switch signatureFontKind(for: text) {
+        case .latin:
             return size * (isEmphasized ? 1.32 : 1.24)
+        case .unifiedCJK:
+            return size * (isEmphasized ? 1.1 : 1.04)
+        case .japanese:
+            return size * (isEmphasized ? 1.08 : 1.02)
+        case .fallbackSystem:
+            return size * (isEmphasized ? 1.04 : 1.0)
         }
-
-        return size * (isEmphasized ? 1.08 : 1.02)
     }
 
     private static func signatureTracking(
@@ -310,7 +329,7 @@ enum OverlayFontResolver {
         text: String,
         isEmphasized: Bool
     ) -> CGFloat {
-        if signatureUsesLatinScript(for: text) {
+        if signatureFontKind(for: text) == .latin {
             // Extra tracking breaks cursive connections in Great Vibes.
             return 0
         }
@@ -323,32 +342,151 @@ enum OverlayFontResolver {
         ) + resolvedSize * (isEmphasized ? 0.008 : 0.004)
     }
 
-    private static func signatureUsesLatinScript(for text: String) -> Bool {
-        let scalars = text.unicodeScalars.filter { !$0.properties.isWhitespace }
-        guard !scalars.isEmpty else { return false }
+    private static func signatureSwiftUIFont(
+        size: CGFloat,
+        weight: Font.Weight,
+        text: String,
+        isEmphasized: Bool
+    ) -> Font {
+        let resolvedSize = signatureAdjustedSize(size, text: text, isEmphasized: isEmphasized)
 
-        let hasCJKOrJapanese = scalars.contains { scalar in
-            let value = scalar.value
-            return (0x3040...0x30FF).contains(value)
-                || (0x3400...0x4DBF).contains(value)
-                || (0x4E00...0x9FFF).contains(value)
-                || (0xF900...0xFAFF).contains(value)
-                || (0xFF66...0xFF9D).contains(value)
+        switch signatureFontKind(for: text) {
+        case .latin:
+            return Font.custom("GreatVibes-Regular", size: resolvedSize)
+        case .japanese:
+            return Font.custom(
+                signatureFontName(text: text, weight: weight, isEmphasized: isEmphasized),
+                size: resolvedSize
+            )
+        case .unifiedCJK:
+            let baseFont = Font.custom("LXGWWenKaiLite-Regular", size: resolvedSize)
+            return baseFont.weight(signatureSyntheticWeight(weight, isEmphasized: isEmphasized))
+        case .fallbackSystem:
+            return Font.system(
+                size: resolvedSize,
+                weight: signatureSyntheticWeight(weight, isEmphasized: isEmphasized),
+                design: .default
+            )
         }
-        if hasCJKOrJapanese {
-            return false
+    }
+
+    private static func signatureUIFont(
+        size: CGFloat,
+        weight: UIFont.Weight,
+        text: String,
+        isEmphasized: Bool
+    ) -> UIFont {
+        let resolvedSize = signatureAdjustedSize(size, text: text, isEmphasized: isEmphasized)
+
+        switch signatureFontKind(for: text) {
+        case .latin, .japanese:
+            let fontName = signatureFontName(text: text, weight: weight, isEmphasized: isEmphasized)
+            return UIFont(name: fontName, size: resolvedSize)
+                ?? UIFont.systemFont(ofSize: resolvedSize, weight: weight)
+        case .unifiedCJK:
+            let baseFont = UIFont(name: "LXGWWenKaiLite-Regular", size: resolvedSize)
+                ?? UIFont.systemFont(ofSize: resolvedSize, weight: .regular)
+            return signatureSyntheticUIFont(baseFont, weight: weight, isEmphasized: isEmphasized)
+        case .fallbackSystem:
+            return UIFont.systemFont(
+                ofSize: resolvedSize,
+                weight: signatureSyntheticWeight(weight, isEmphasized: isEmphasized)
+            )
+        }
+    }
+
+    private static func signatureFontKind(for text: String) -> SignatureFontKind {
+        let scalars = text.unicodeScalars.filter { !$0.properties.isWhitespace }
+        guard !scalars.isEmpty else { return .japanese }
+
+        if scalars.contains(where: isJapaneseKana) {
+            return .japanese
+        }
+        if scalars.contains(where: isHangul) || scalars.contains(where: isHanIdeograph) {
+            return .unifiedCJK
         }
 
         let hasNonLatinLetters = scalars.contains { scalar in
             CharacterSet.letters.contains(scalar) && !isSupportedLatin(scalar)
         }
         if hasNonLatinLetters {
-            return false
+            return .fallbackSystem
         }
 
-        return scalars.contains { scalar in
+        let hasLatinOrDigits = scalars.contains { scalar in
             isSupportedLatin(scalar) || CharacterSet.decimalDigits.contains(scalar)
         }
+        return hasLatinOrDigits ? .latin : .japanese
+    }
+
+    private static func signatureSyntheticWeight(
+        _ weight: Font.Weight,
+        isEmphasized: Bool
+    ) -> Font.Weight {
+        switch weight {
+        case .black, .heavy, .bold:
+            return .bold
+        case .semibold:
+            return .semibold
+        default:
+            return isEmphasized ? .semibold : weight
+        }
+    }
+
+    private static func signatureSyntheticWeight(
+        _ weight: UIFont.Weight,
+        isEmphasized: Bool
+    ) -> UIFont.Weight {
+        if weight.rawValue >= UIFont.Weight.bold.rawValue {
+            return .bold
+        }
+        if isEmphasized || weight.rawValue >= UIFont.Weight.semibold.rawValue {
+            return .semibold
+        }
+        return weight
+    }
+
+    private static func signatureSyntheticUIFont(
+        _ font: UIFont,
+        weight: UIFont.Weight,
+        isEmphasized: Bool
+    ) -> UIFont {
+        let resolvedWeight = signatureSyntheticWeight(weight, isEmphasized: isEmphasized)
+        guard resolvedWeight.rawValue >= UIFont.Weight.semibold.rawValue else {
+            return font
+        }
+
+        let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) ?? font.fontDescriptor
+        return UIFont(descriptor: descriptor, size: font.pointSize)
+    }
+
+    private static func isJapaneseKana(_ scalar: Unicode.Scalar) -> Bool {
+        let value = scalar.value
+        return (0x3040...0x30FF).contains(value)
+            || (0x31F0...0x31FF).contains(value)
+            || (0xFF66...0xFF9D).contains(value)
+    }
+
+    private static func isHangul(_ scalar: Unicode.Scalar) -> Bool {
+        let value = scalar.value
+        return (0x1100...0x11FF).contains(value)
+            || (0x3130...0x318F).contains(value)
+            || (0xA960...0xA97F).contains(value)
+            || (0xAC00...0xD7AF).contains(value)
+            || (0xD7B0...0xD7FF).contains(value)
+    }
+
+    private static func isHanIdeograph(_ scalar: Unicode.Scalar) -> Bool {
+        let value = scalar.value
+        return (0x3400...0x4DBF).contains(value)
+            || (0x4E00...0x9FFF).contains(value)
+            || (0xF900...0xFAFF).contains(value)
+            || (0x20000...0x2A6DF).contains(value)
+            || (0x2A700...0x2B73F).contains(value)
+            || (0x2B740...0x2B81F).contains(value)
+            || (0x2B820...0x2CEAF).contains(value)
+            || (0x2CEB0...0x2EBEF).contains(value)
+            || (0x30000...0x3134F).contains(value)
     }
 
     private static func isSupportedLatin(_ scalar: Unicode.Scalar) -> Bool {
@@ -366,5 +504,12 @@ enum OverlayFontResolver {
         default:
             return false
         }
+    }
+
+    private enum SignatureFontKind {
+        case latin
+        case japanese
+        case unifiedCJK
+        case fallbackSystem
     }
 }

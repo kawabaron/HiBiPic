@@ -78,10 +78,10 @@
 		A100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt */; };
 		A100000001000074 /* ja.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000074 /* ja.lproj */; };
 		A100000001000075 /* en-US.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000075 /* en-US.lproj */; };
-		A100000001000076 /* en-GB.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000076 /* en-GB.lproj */; };
-		A100000001000077 /* de.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000077 /* de.lproj */; };
-		A100000001000078 /* es-MX.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000078 /* es-MX.lproj */; };
-		A100000001000079 /* pt-BR.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000079 /* pt-BR.lproj */; };
+		A100000001000081 /* ko.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000081 /* ko.lproj */; };
+		A100000001000082 /* zh-Hans.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000082 /* zh-Hans.lproj */; };
+		A100000001000083 /* zh-Hant.lproj in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000083 /* zh-Hant.lproj */; };
+		A100000001000080 /* LXGWWenKaiLite-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B100000001000080 /* LXGWWenKaiLite-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -157,10 +157,10 @@
 		B100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Fonts/THIRD_PARTY_FONT_LICENSES.txt; sourceTree = "<group>"; };
 		B100000001000074 /* ja.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ja.lproj; sourceTree = "<group>"; };
 		B100000001000075 /* en-US.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "en-US.lproj"; sourceTree = "<group>"; };
-		B100000001000076 /* en-GB.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "en-GB.lproj"; sourceTree = "<group>"; };
-		B100000001000077 /* de.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = de.lproj; sourceTree = "<group>"; };
-		B100000001000078 /* es-MX.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "es-MX.lproj"; sourceTree = "<group>"; };
-		B100000001000079 /* pt-BR.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "pt-BR.lproj"; sourceTree = "<group>"; };
+		B100000001000080 /* LXGWWenKaiLite-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fonts/LXGWWenKaiLite-Regular.ttf; sourceTree = "<group>"; };
+		B100000001000081 /* ko.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ko.lproj; sourceTree = "<group>"; };
+		B100000001000082 /* zh-Hans.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zh-Hans.lproj"; sourceTree = "<group>"; };
+		B100000001000083 /* zh-Hant.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "zh-Hant.lproj"; sourceTree = "<group>"; };
 		B100000001000099 /* HiBiPic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HiBiPic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -455,13 +455,13 @@
 				B100000001000070 /* KleeOne-Regular.ttf */,
 				B100000001000071 /* KleeOne-SemiBold.ttf */,
 				B100000001000072 /* GreatVibes-Regular.ttf */,
+				B100000001000080 /* LXGWWenKaiLite-Regular.ttf */,
 				B100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt */,
 				B100000001000074 /* ja.lproj */,
 				B100000001000075 /* en-US.lproj */,
-				B100000001000076 /* en-GB.lproj */,
-				B100000001000077 /* de.lproj */,
-				B100000001000078 /* es-MX.lproj */,
-				B100000001000079 /* pt-BR.lproj */,
+				B100000001000081 /* ko.lproj */,
+				B100000001000082 /* zh-Hans.lproj */,
+				B100000001000083 /* zh-Hant.lproj */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -516,6 +516,9 @@
 			knownRegions = (
 				ja,
 				en,
+				ko,
+				"zh-Hans",
+				"zh-Hant",
 				Base,
 			);
 			mainGroup = D100000001000000;
@@ -537,13 +540,13 @@
 				A100000001000070 /* KleeOne-Regular.ttf in Resources */,
 				A100000001000071 /* KleeOne-SemiBold.ttf in Resources */,
 				A100000001000072 /* GreatVibes-Regular.ttf in Resources */,
+				A100000001000080 /* LXGWWenKaiLite-Regular.ttf in Resources */,
 				A100000001000073 /* THIRD_PARTY_FONT_LICENSES.txt in Resources */,
 				A100000001000074 /* ja.lproj in Resources */,
 				A100000001000075 /* en-US.lproj in Resources */,
-				A100000001000076 /* en-GB.lproj in Resources */,
-				A100000001000077 /* de.lproj in Resources */,
-				A100000001000078 /* es-MX.lproj in Resources */,
-				A100000001000079 /* pt-BR.lproj in Resources */,
+				A100000001000081 /* ko.lproj in Resources */,
+				A100000001000082 /* zh-Hans.lproj in Resources */,
+				A100000001000083 /* zh-Hant.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
